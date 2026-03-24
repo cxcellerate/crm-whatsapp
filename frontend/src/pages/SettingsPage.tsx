@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Wifi, Users, GitBranch, Plus, Trash2, CheckCircle, XCircle } from 'lucide-react';
 import { api } from '../services/api';
 import { usePipelines, useCreatePipeline, useCreateStage, useDeleteStage } from '../hooks/usePipelines';
-import { WhatsAppStatus } from '../components/whatsapp/WhatsAppStatus';
+import { WhatsAppProviderConfig } from '../components/whatsapp/WhatsAppProviderConfig';
 import { Modal } from '../components/ui/Modal';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import toast from 'react-hot-toast';
@@ -15,8 +15,6 @@ export function SettingsPage() {
   const [selectedPipelineId, setSelectedPipelineId] = useState<string | null>(null);
   const [stageModalOpen, setStageModalOpen] = useState(false);
   const [deletingStage, setDeletingStage] = useState<{ pipelineId: string; stageId: string } | null>(null);
-  const [waUrl, setWaUrl] = useState('');
-  const [waKey, setWaKey] = useState('');
 
   const { data: pipelines = [] } = usePipelines();
   const { data: users = [] } = useQuery({ queryKey: ['users'], queryFn: () => api.get('/users').then(r => r.data) });
@@ -45,31 +43,13 @@ export function SettingsPage() {
     <div className="space-y-6 max-w-3xl">
       <h1 className="text-2xl font-bold text-dark-50">Configurações</h1>
 
-      {/* WhatsApp */}
-      <div className="card p-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Wifi size={18} className="text-brand-400" />
-            <h2 className="font-semibold text-dark-100">WhatsApp Business API</h2>
-          </div>
-          <WhatsAppStatus />
+      {/* WhatsApp — com seletor de provedor */}
+      <div className="card p-6">
+        <div className="flex items-center gap-3 mb-5">
+          <Wifi size={18} className="text-brand-400" />
+          <h2 className="font-semibold text-dark-100">WhatsApp Business</h2>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="label">URL da Evolution API</label>
-            <input className="input" placeholder="http://localhost:8080" value={waUrl} onChange={e => setWaUrl(e.target.value)} />
-          </div>
-          <div>
-            <label className="label">API Key</label>
-            <input className="input" type="password" placeholder="••••••••••••" value={waKey} onChange={e => setWaKey(e.target.value)} />
-          </div>
-        </div>
-        <button className="btn-primary">Salvar e Testar Conexão</button>
-        <div className="bg-dark-800 rounded-lg p-3 text-xs text-dark-400 space-y-1">
-          <p className="font-medium text-dark-300">Webhook para receber mensagens:</p>
-          <p className="font-mono text-brand-400">POST /api/webhooks/whatsapp</p>
-          <p>Configure esta URL nas instâncias da Evolution API.</p>
-        </div>
+        <WhatsAppProviderConfig />
       </div>
 
       {/* Pipelines */}
@@ -153,22 +133,6 @@ export function SettingsPage() {
         </div>
       </div>
 
-      {/* Captura de Leads */}
-      <div className="card p-6 space-y-3">
-        <div className="flex items-center gap-3">
-          <GitBranch size={18} className="text-brand-400" />
-          <h2 className="font-semibold text-dark-100">Captura de Leads via Formulário</h2>
-        </div>
-        <p className="text-sm text-dark-400">Use a URL abaixo para integrar formulários externos (RD Station, HubSpot, Typeform, etc.):</p>
-        <div className="bg-dark-800 rounded-lg p-3 font-mono text-xs text-brand-400">
-          POST /api/webhooks/form/:token
-        </div>
-        <div className="text-xs text-dark-500 space-y-1">
-          <p><span className="text-dark-400">Campos aceitos:</span> name*, phone*, email, utmSource, utmMedium, utmCampaign</p>
-          <p><span className="text-dark-400">Content-Type:</span> application/json</p>
-        </div>
-      </div>
-
       {/* Modal nova etapa */}
       <Modal open={stageModalOpen} onClose={() => setStageModalOpen(false)} title="Nova Etapa" size="sm">
         <form onSubmit={handleCreateStage} className="space-y-4">
@@ -180,13 +144,9 @@ export function SettingsPage() {
             <label className="label">Cor</label>
             <div className="flex gap-2 flex-wrap mt-1">
               {COLORS.map((c) => (
-                <button
-                  key={c}
-                  type="button"
+                <button key={c} type="button"
                   className={`w-7 h-7 rounded-full border-2 transition-transform hover:scale-110 ${newStageColor === c ? 'border-white scale-110' : 'border-transparent'}`}
-                  style={{ backgroundColor: c }}
-                  onClick={() => setNewStageColor(c)}
-                />
+                  style={{ backgroundColor: c }} onClick={() => setNewStageColor(c)} />
               ))}
             </div>
           </div>

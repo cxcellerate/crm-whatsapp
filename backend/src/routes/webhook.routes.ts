@@ -1,10 +1,13 @@
 import { Router } from 'express';
-import { receiveWhatsApp, captureFormLead } from '../controllers/webhook.controller';
+import { receiveWhatsApp, receiveZapi, captureFormLead } from '../controllers/webhook.controller';
 
 export const webhookRoutes = Router();
 
-// Webhook do WhatsApp (Evolution API)
+// Evolution API
 webhookRoutes.post('/whatsapp', receiveWhatsApp);
+
+// Z-API
+webhookRoutes.post('/zapi', receiveZapi);
 
 // Captura de lead via formulário externo
 webhookRoutes.post('/form/:token', captureFormLead);

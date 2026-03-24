@@ -163,6 +163,16 @@ enum ActivityType {
   TASK
 }
 
+// Configurações gerais do sistema (chave-valor)
+model Setting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}
+
 model FormCapture {
   id         String   @id @default(uuid())
   name       String

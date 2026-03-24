@@ -5,26 +5,26 @@ import { Wifi, WifiOff, RefreshCw } from 'lucide-react';
 export function WhatsAppStatus() {
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['whatsapp-status'],
-    queryFn: () => api.get('/webhooks/whatsapp/status').then((r) => r.data).catch(() => ({ state: 'disconnected' })),
+    queryFn: () =>
+      api.get('/settings/whatsapp/status').then((r) => r.data).catch(() => ({ state: 'disconnected' })),
     refetchInterval: 30_000,
   });
 
-  const connected = data?.state === 'open';
+  const connected = data?.state === 'open' || data?.state === 'CONNECTED';
+  const providerLabel = data?.provider === 'zapi' ? 'Z-API' : 'Evolution';
 
   return (
     <div className="flex items-center gap-2">
-      {isLoading ? (
-        <RefreshCw size={14} className="animate-spin text-dark-400" />
-      ) : connected ? (
-        <Wifi size={14} className="text-green-400" />
-      ) : (
-        <WifiOff size={14} className="text-red-400" />
-      )}
+      {isLoading
+        ? <RefreshCw size={13} className="animate-spin text-dark-500" />
+        : connected
+          ? <Wifi size={13} className="text-green-400" />
+          : <WifiOff size={13} className="text-red-400" />}
       <span className={`text-xs font-medium ${connected ? 'text-green-400' : 'text-red-400'}`}>
-        WhatsApp {connected ? 'conectado' : 'desconectado'}
+        {connected ? `Conectado · ${providerLabel}` : 'Desconectado'}
       </span>
-      <button onClick={() => refetch()} className="p-1 hover:bg-dark-600 rounded transition-colors" title="Atualizar status">
-        <RefreshCw size={11} className="text-dark-500" />
+      <button onClick={() => refetch()} className="p-0.5 hover:bg-dark-600 rounded text-dark-600 hover:text-dark-400 transition-colors">
+        <RefreshCw size={10} />
       </button>
     </div>
   );

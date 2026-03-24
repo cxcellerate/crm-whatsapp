@@ -12,6 +12,7 @@ import { webhookRoutes } from './routes/webhook.routes';
 import { dashboardRoutes } from './routes/dashboard.routes';
 import { userRoutes } from './routes/user.routes';
 import { formCaptureRoutes } from './routes/form-capture.routes';
+import { settingsRoutes } from './routes/settings.routes';
 import { errorHandler } from './middleware/error.middleware';
 
 const app = express();
@@ -47,6 +48,7 @@ app.use('/api/webhooks', webhookRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/form-captures', formCaptureRoutes);
+app.use('/api/settings', settingsRoutes);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', env: process.env.NODE_ENV, timestamp: new Date().toISOString() });
