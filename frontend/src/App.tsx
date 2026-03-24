@@ -7,6 +7,9 @@ import { KanbanPage } from './pages/KanbanPage';
 import { LeadsPage } from './pages/LeadsPage';
 import { LeadDetailPage } from './pages/LeadDetailPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { UsersPage } from './pages/UsersPage';
+import { QRCapturePage } from './pages/QRCapturePage';
+import { ReportsPage } from './pages/ReportsPage';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const token = useAuthStore((s) => s.token);
@@ -31,6 +34,9 @@ export default function App() {
           <Route path="kanban" element={<KanbanPage />} />
           <Route path="leads" element={<LeadsPage />} />
           <Route path="leads/:id" element={<LeadDetailPage />} />
+          <Route path="users" element={<UsersPage />} />
+          <Route path="capture" element={<QRCapturePage />} />
+          <Route path="reports" element={<ReportsPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

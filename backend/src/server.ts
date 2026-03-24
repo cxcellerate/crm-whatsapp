@@ -13,6 +13,7 @@ import { pipelineRoutes } from './routes/pipeline.routes';
 import { webhookRoutes } from './routes/webhook.routes';
 import { dashboardRoutes } from './routes/dashboard.routes';
 import { userRoutes } from './routes/user.routes';
+import { formCaptureRoutes } from './routes/form-capture.routes';
 import { errorHandler } from './middleware/error.middleware';
 import { logger } from './utils/logger';
 
@@ -41,6 +42,7 @@ app.use('/api/pipelines', pipelineRoutes);
 app.use('/api/webhooks', webhookRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/form-captures', formCaptureRoutes);
 
 // Health check
 app.get('/health', (_req, res) => {

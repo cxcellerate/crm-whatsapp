@@ -1,32 +1,30 @@
-import { Bell, LogOut, User } from 'lucide-react';
+import { LogOut, User } from 'lucide-react';
 import { useAuthStore } from '../../store/auth.store';
+import { NotificationBell } from './NotificationBell';
 
 export function Header() {
   const { user, logout } = useAuthStore();
 
   return (
-    <header className="h-16 bg-dark-900 border-b border-dark-700 flex items-center justify-between px-6">
+    <header className="h-14 bg-dark-900 border-b border-dark-700 flex items-center justify-between px-6 shrink-0">
       <div />
-      <div className="flex items-center gap-3">
-        <button className="btn-ghost p-2 rounded-lg relative">
-          <Bell size={18} />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-brand-500 rounded-full" />
-        </button>
+      <div className="flex items-center gap-2">
+        <NotificationBell />
 
         <div className="flex items-center gap-2 pl-3 border-l border-dark-700">
-          <div className="w-8 h-8 bg-dark-600 rounded-full flex items-center justify-center">
-            <User size={14} className="text-dark-300" />
+          <div className="w-7 h-7 bg-dark-700 rounded-full flex items-center justify-center text-dark-300 text-xs font-bold">
+            {user?.name?.[0]?.toUpperCase() || <User size={12} />}
           </div>
-          <div className="text-sm">
-            <p className="font-medium text-dark-100 leading-tight">{user?.name}</p>
-            <p className="text-dark-400 text-xs">{user?.role}</p>
+          <div className="text-sm hidden sm:block">
+            <p className="font-medium text-dark-100 text-xs leading-tight">{user?.name}</p>
+            <p className="text-dark-500 text-[10px]">{user?.role}</p>
           </div>
           <button
             onClick={logout}
-            className="ml-2 p-1.5 rounded-lg hover:bg-dark-700 text-dark-400 hover:text-dark-100 transition-colors"
+            className="ml-1 p-1.5 rounded-lg hover:bg-dark-700 text-dark-500 hover:text-red-400 transition-colors"
             title="Sair"
           >
-            <LogOut size={15} />
+            <LogOut size={14} />
           </button>
         </div>
       </div>
