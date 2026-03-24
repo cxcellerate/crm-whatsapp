@@ -33,6 +33,7 @@ export default function App() {
           <Route path="leads/:id" element={<LeadDetailPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
