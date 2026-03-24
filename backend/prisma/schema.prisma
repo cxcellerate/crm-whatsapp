@@ -1,5 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  // Necessário para deploy serverless (Vercel, AWS Lambda, etc.)
+  binaryTargets = ["native", "rhel-openssl-1.0.x", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
@@ -18,8 +20,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  leads     Lead[]
-  messages  Message[]
+  leads      Lead[]
+  messages   Message[]
   activities Activity[]
 
   @@map("users")
@@ -60,7 +62,7 @@ model Stage {
 }
 
 model Lead {
-  id          String      @id @default(uuid())
+  id          String     @id @default(uuid())
   name        String
   phone       String
   email       String?
@@ -68,10 +70,10 @@ model Lead {
   value       Float?
   notes       String?
   stageId     String
-  stage       Stage       @relation(fields: [stageId], references: [id])
+  stage       Stage      @relation(fields: [stageId], references: [id])
   assignedTo  String?
-  user        User?       @relation(fields: [assignedTo], references: [id])
-  source      LeadSource  @default(MANUAL)
+  user        User?      @relation(fields: [assignedTo], references: [id])
+  source      LeadSource @default(MANUAL)
   utmSource   String?
   utmMedium   String?
   utmCampaign String?
@@ -79,8 +81,8 @@ model Lead {
   lostReason  String?
   wonAt       DateTime?
   lostAt      DateTime?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
   messages   Message[]
   activities Activity[]
@@ -99,18 +101,18 @@ enum LeadSource {
 }
 
 model Message {
-  id         String        @id @default(uuid())
-  leadId     String
-  lead       Lead          @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  userId     String?
-  user       User?         @relation(fields: [userId], references: [id])
-  content    String
-  type       MessageType   @default(TEXT)
-  direction  Direction     @default(OUTBOUND)
-  status     MessageStatus @default(SENT)
+  id          String        @id @default(uuid())
+  leadId      String
+  lead        Lead          @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  userId      String?
+  user        User?         @relation(fields: [userId], references: [id])
+  content     String
+  type        MessageType   @default(TEXT)
+  direction   Direction     @default(OUTBOUND)
+  status      MessageStatus @default(SENT)
   waMessageId String?
-  mediaUrl   String?
-  createdAt  DateTime      @default(now())
+  mediaUrl    String?
+  createdAt   DateTime      @default(now())
 
   @@map("messages")
 }
@@ -162,15 +164,15 @@ enum ActivityType {
 }
 
 model FormCapture {
-  id        String   @id @default(uuid())
-  name      String
-  token     String   @unique @default(uuid())
+  id         String   @id @default(uuid())
+  name       String
+  token      String   @unique @default(uuid())
   pipelineId String?
-  stageId   String?
-  assignTo  String?
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  stageId    String?
+  assignTo   String?
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@map("form_captures")
 }

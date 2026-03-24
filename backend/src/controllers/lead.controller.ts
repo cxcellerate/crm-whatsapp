@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { prisma } from '../utils/prisma';
 import { AppError } from '../middleware/error.middleware';
 import { AuthRequest } from '../middleware/auth.middleware';
-import { io } from '../server';
+import { emitEvent } from '../utils/socket';
 
 export async function getLeads(req: AuthRequest, res: Response) {
   const { stageId, assignedTo, search } = req.query;
@@ -68,15 +68,10 @@ export async function createLead(req: AuthRequest, res: Response) {
   });
 
   await prisma.activity.create({
-    data: {
-      leadId: lead.id,
-      userId: req.userId,
-      type: 'NOTE',
-      content: `Lead criado`,
-    },
+    data: { leadId: lead.id, userId: req.userId, type: 'NOTE', content: 'Lead criado' },
   });
 
-  io.emit('lead:created', lead);
+  emitEvent('lead:created', lead);
   res.status(201).json(lead);
 }
 
@@ -94,7 +89,7 @@ export async function updateLead(req: AuthRequest, res: Response) {
     },
   });
 
-  io.emit('lead:updated', lead);
+  emitEvent('lead:updated', lead);
   res.json(lead);
 }
 
@@ -104,7 +99,7 @@ export async function deleteLead(req: AuthRequest, res: Response) {
   if (!exists) throw new AppError('Lead não encontrado', 404);
 
   await prisma.lead.delete({ where: { id } });
-  io.emit('lead:deleted', { id });
+  emitEvent('lead:deleted', { id });
   res.status(204).send();
 }
 
@@ -136,6 +131,6 @@ export async function moveLead(req: AuthRequest, res: Response) {
     },
   });
 
-  io.emit('lead:moved', updated);
+  emitEvent('lead:moved', updated);
   res.json(updated);
 }

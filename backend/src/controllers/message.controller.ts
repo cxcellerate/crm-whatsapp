@@ -3,7 +3,7 @@ import { prisma } from '../utils/prisma';
 import { AppError } from '../middleware/error.middleware';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { sendWhatsAppMessage } from '../services/whatsapp.service';
-import { io } from '../server';
+import { emitEvent, emitToRoom } from '../utils/socket';
 
 export async function getMessages(req: AuthRequest, res: Response) {
   const { leadId } = req.params;
@@ -24,13 +24,12 @@ export async function sendMessage(req: AuthRequest, res: Response) {
   const lead = await prisma.lead.findUnique({ where: { id: leadId } });
   if (!lead) throw new AppError('Lead não encontrado', 404);
 
-  // Envia via WhatsApp
   let waMessageId: string | undefined;
   try {
     const waResult = await sendWhatsAppMessage(lead.phone, content);
-    waMessageId = waResult.key?.id;
-  } catch (err) {
-    // Salva a mensagem mesmo se WhatsApp falhar
+    waMessageId = waResult?.key?.id;
+  } catch {
+    // Salva mesmo se WhatsApp falhar
   }
 
   const message = await prisma.message.create({
@@ -51,10 +50,10 @@ export async function sendMessage(req: AuthRequest, res: Response) {
       leadId,
       userId: req.userId,
       type: 'MESSAGE_SENT',
-      content: `Mensagem enviada: ${content.substring(0, 50)}...`,
+      content: `Mensagem: ${content.substring(0, 60)}`,
     },
   });
 
-  io.to(`lead:${leadId}`).emit('message:new', message);
+  emitToRoom(`lead:${leadId}`, 'message:new', message);
   res.status(201).json(message);
 }
