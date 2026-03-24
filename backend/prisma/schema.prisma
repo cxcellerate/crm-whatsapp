@@ -1,0 +1,176 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(SELLER)
+  avatar    String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  leads     Lead[]
+  messages  Message[]
+  activities Activity[]
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  SELLER
+}
+
+model Pipeline {
+  id        String   @id @default(uuid())
+  name      String
+  order     Int      @default(0)
+  color     String   @default("#6366f1")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  stages Stage[]
+
+  @@map("pipelines")
+}
+
+model Stage {
+  id         String   @id @default(uuid())
+  name       String
+  order      Int      @default(0)
+  color      String   @default("#6366f1")
+  pipelineId String
+  pipeline   Pipeline @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  leads Lead[]
+
+  @@map("stages")
+}
+
+model Lead {
+  id          String      @id @default(uuid())
+  name        String
+  phone       String
+  email       String?
+  company     String?
+  value       Float?
+  notes       String?
+  stageId     String
+  stage       Stage       @relation(fields: [stageId], references: [id])
+  assignedTo  String?
+  user        User?       @relation(fields: [assignedTo], references: [id])
+  source      LeadSource  @default(MANUAL)
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  tags        String[]
+  lostReason  String?
+  wonAt       DateTime?
+  lostAt      DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  messages   Message[]
+  activities Activity[]
+
+  @@map("leads")
+}
+
+enum LeadSource {
+  MANUAL
+  FORM
+  WHATSAPP
+  GOOGLE_ADS
+  META_ADS
+  ORGANIC
+  REFERRAL
+}
+
+model Message {
+  id         String        @id @default(uuid())
+  leadId     String
+  lead       Lead          @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  userId     String?
+  user       User?         @relation(fields: [userId], references: [id])
+  content    String
+  type       MessageType   @default(TEXT)
+  direction  Direction     @default(OUTBOUND)
+  status     MessageStatus @default(SENT)
+  waMessageId String?
+  mediaUrl   String?
+  createdAt  DateTime      @default(now())
+
+  @@map("messages")
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  AUDIO
+  VIDEO
+  DOCUMENT
+  TEMPLATE
+}
+
+enum Direction {
+  INBOUND
+  OUTBOUND
+}
+
+enum MessageStatus {
+  PENDING
+  SENT
+  DELIVERED
+  READ
+  FAILED
+}
+
+model Activity {
+  id        String       @id @default(uuid())
+  leadId    String
+  lead      Lead         @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?        @relation(fields: [userId], references: [id])
+  type      ActivityType
+  content   String
+  createdAt DateTime     @default(now())
+
+  @@map("activities")
+}
+
+enum ActivityType {
+  NOTE
+  STAGE_CHANGE
+  MESSAGE_SENT
+  MESSAGE_RECEIVED
+  CALL
+  MEETING
+  EMAIL
+  TASK
+}
+
+model FormCapture {
+  id        String   @id @default(uuid())
+  name      String
+  token     String   @unique @default(uuid())
+  pipelineId String?
+  stageId   String?
+  assignTo  String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("form_captures")
+}
