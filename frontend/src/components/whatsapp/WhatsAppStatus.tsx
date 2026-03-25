@@ -11,20 +11,20 @@ export function WhatsAppStatus() {
   });
 
   const connected = data?.state === 'open' || data?.state === 'CONNECTED';
-  const providerLabel = data?.provider === 'zapi' ? 'Z-API' : 'Evolution';
+  const label = data?.provider === 'zapi' ? 'Z-API' : 'Evolution';
 
   return (
     <div className="flex items-center gap-2">
       {isLoading
-        ? <RefreshCw size={13} className="animate-spin text-dark-500" />
+        ? <RefreshCw size={12} className="animate-spin text-navy-400" />
         : connected
-          ? <Wifi size={13} className="text-green-400" />
-          : <WifiOff size={13} className="text-red-400" />}
-      <span className={`text-xs font-medium ${connected ? 'text-green-400' : 'text-red-400'}`}>
-        {connected ? `Conectado · ${providerLabel}` : 'Desconectado'}
+          ? <Wifi size={12} className="text-success-500" />
+          : <WifiOff size={12} className="text-danger-500" />}
+      <span className={`text-xs font-medium ${connected ? 'text-success-500' : 'text-danger-400'}`}>
+        {connected ? `Conectado · ${label}` : 'Desconectado'}
       </span>
-      <button onClick={() => refetch()} className="p-0.5 hover:bg-dark-600 rounded text-dark-600 hover:text-dark-400 transition-colors">
-        <RefreshCw size={10} />
+      <button onClick={() => refetch()} className="ml-auto p-0.5 rounded hover:bg-navy-700 text-navy-500 hover:text-navy-300 transition-colors">
+        <RefreshCw size={9} />
       </button>
     </div>
   );

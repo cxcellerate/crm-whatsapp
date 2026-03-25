@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 
 interface Props {
@@ -9,7 +10,7 @@ interface Props {
   size?: 'sm' | 'md' | 'lg';
 }
 
-const sizes = { sm: 'max-w-sm', md: 'max-w-lg', lg: 'max-w-2xl' };
+const sizes = { sm: 'max-w-md', md: 'max-w-xl', lg: 'max-w-2xl' };
 
 export function Modal({ open, onClose, title, children, size = 'md' }: Props) {
   useEffect(() => {
@@ -19,20 +20,38 @@ export function Modal({ open, onClose, title, children, size = 'md' }: Props) {
     return () => window.removeEventListener('keydown', handler);
   }, [open, onClose]);
 
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className={`relative w-full ${sizes[size]} bg-dark-800 rounded-2xl border border-dark-600 shadow-2xl`}>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-dark-700">
-          <h2 className="font-semibold text-dark-100">{title}</h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-dark-700 text-dark-400 hover:text-dark-100 transition-colors">
-            <X size={16} />
-          </button>
+    <AnimatePresence>
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="absolute inset-0 bg-surface-900/40 backdrop-blur-sm"
+            onClick={onClose}
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 12 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className={`relative w-full ${sizes[size]} bg-white rounded-2xl shadow-card-lg border border-surface-200`}
+          >
+            <div className="flex items-center justify-between px-6 py-4 border-b border-surface-100">
+              <h2 className="font-bold text-surface-800 text-base">{title}</h2>
+              <button
+                onClick={onClose}
+                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-surface-100 text-surface-400 hover:text-surface-700 transition-colors"
+              >
+                <X size={15} />
+              </button>
+            </div>
+            <div className="p-6">{children}</div>
+          </motion.div>
         </div>
-        <div className="p-6">{children}</div>
-      </div>
-    </div>
+      )}
+    </AnimatePresence>
   );
 }
