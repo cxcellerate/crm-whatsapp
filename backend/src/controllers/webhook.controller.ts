@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import { prisma } from '../utils/prisma';
 import { emitEvent, emitToRoom } from '../utils/socket';
+import { sendWhatsAppMessage } from '../services/whatsapp.service';
+import { isAgentEnabled, processAgentMessage } from '../services/ai-agent.service';
 import { logger } from '../utils/logger';
 
-// Cria ou encontra lead pelo telefone e salva mensagem recebida
 async function processInboundMessage(phone: string, content: string, waMessageId?: string) {
   if (!phone || !content) return;
 
@@ -24,7 +25,8 @@ async function processInboundMessage(phone: string, content: string, waMessageId
     emitEvent('lead:created', lead);
   }
 
-  const message = await prisma.message.create({
+  // Salva mensagem recebida
+  const inboundMessage = await prisma.message.create({
     data: {
       leadId: lead.id,
       content,
@@ -34,8 +36,31 @@ async function processInboundMessage(phone: string, content: string, waMessageId
     },
   });
 
-  emitToRoom(`lead:${lead.id}`, 'message:new', message);
-  emitEvent('whatsapp:message', { lead, message });
+  emitToRoom(`lead:${lead.id}`, 'message:new', inboundMessage);
+  emitEvent('whatsapp:message', { lead, message: inboundMessage });
+
+  // Agente de IA responde automaticamente (se ativado)
+  try {
+    const agentOn = await isAgentEnabled();
+    if (agentOn) {
+      const reply = await processAgentMessage(phone, content, lead.id);
+      if (reply) {
+        const waResult = await sendWhatsAppMessage(phone, reply).catch(() => null);
+        const outbound = await prisma.message.create({
+          data: {
+            leadId: lead.id,
+            content: reply,
+            direction: 'OUTBOUND',
+            status: waResult ? 'SENT' : 'FAILED',
+            waMessageId: waResult?.key?.id,
+          },
+        });
+        emitToRoom(`lead:${lead.id}`, 'message:new', outbound);
+      }
+    }
+  } catch (err) {
+    logger.error(`[Webhook] Erro no agente de IA: ${err}`);
+  }
 }
 
 // ─── Evolution API ─────────────────────────────────────────────────────────────
@@ -50,8 +75,8 @@ export async function receiveWhatsApp(req: Request, res: Response) {
     const phone = msg.key.remoteJid?.replace('@s.whatsapp.net', '').replace(/\D/g, '');
     const content = msg.message?.conversation || msg.message?.extendedTextMessage?.text || '';
 
+    res.sendStatus(200); // responde imediatamente ao WhatsApp
     await processInboundMessage(phone, content, msg.key.id);
-    res.sendStatus(200);
   } catch (err) {
     logger.error(`Webhook Evolution error: ${err}`);
     res.sendStatus(500);
@@ -62,23 +87,18 @@ export async function receiveWhatsApp(req: Request, res: Response) {
 export async function receiveZapi(req: Request, res: Response) {
   try {
     const body = req.body;
-
-    // Z-API envia vários tipos de callback — processar apenas mensagens recebidas
     if (body.fromMe === true) return res.sendStatus(200);
 
-    // Tipos que têm mensagem de texto
     const type: string = body.type || '';
-    if (!['ReceivedCallback', 'MessageStatusCallback'].includes(type) && !body.text) {
-      return res.sendStatus(200);
-    }
+    if (!['ReceivedCallback'].includes(type) && !body.text) return res.sendStatus(200);
 
-    const phone = (body.phone || body.chatId || '').replace(/\D/g, '').replace(/^55/, '');
-    const fullPhone = `55${phone}`;
+    const rawPhone = (body.phone || body.chatId || '').replace(/\D/g, '');
+    const phone = rawPhone.startsWith('55') ? rawPhone : `55${rawPhone}`;
     const content = body.text?.message || body.caption || body.body || '';
     const messageId = body.messageId || body.zaapId;
 
-    await processInboundMessage(fullPhone, content, messageId);
-    res.sendStatus(200);
+    res.sendStatus(200); // responde imediatamente
+    await processInboundMessage(phone, content, messageId);
   } catch (err) {
     logger.error(`Webhook Z-API error: ${err}`);
     res.sendStatus(500);
@@ -100,13 +120,7 @@ export async function captureFormLead(req: Request, res: Response) {
     if (!stageId) return res.status(400).json({ error: 'Nenhuma etapa configurada' });
 
     const lead = await prisma.lead.create({
-      data: {
-        name, phone, email,
-        stageId,
-        assignedTo: form.assignTo || undefined,
-        source: 'FORM',
-        utmSource, utmMedium, utmCampaign,
-      },
+      data: { name, phone, email, stageId, assignedTo: form.assignTo || undefined, source: 'FORM', utmSource, utmMedium, utmCampaign },
     });
 
     emitEvent('lead:created', lead);

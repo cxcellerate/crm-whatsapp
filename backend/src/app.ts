@@ -13,6 +13,7 @@ import { dashboardRoutes } from './routes/dashboard.routes';
 import { userRoutes } from './routes/user.routes';
 import { formCaptureRoutes } from './routes/form-capture.routes';
 import { settingsRoutes } from './routes/settings.routes';
+import { aiAgentRoutes } from './routes/ai-agent.routes';
 import { errorHandler } from './middleware/error.middleware';
 
 const app = express();
@@ -49,6 +50,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/form-captures', formCaptureRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/ai-agent', aiAgentRoutes);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', env: process.env.NODE_ENV, timestamp: new Date().toISOString() });

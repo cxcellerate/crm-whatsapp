@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Kanban, Users, MessageSquare,
-  Settings, Zap, QrCode, BarChart2, UserCog,
+  Settings, Zap, QrCode, BarChart2, UserCog, Bot,
 } from 'lucide-react';
 import { WhatsAppStatus } from '../whatsapp/WhatsAppStatus';
 
@@ -17,6 +17,7 @@ const navGroups = [
   {
     label: 'Ferramentas',
     items: [
+      { to: '/ai-agent', icon: Bot, label: 'Agente de IA' },
       { to: '/capture', icon: QrCode, label: 'Captura de Leads' },
       { to: '/reports', icon: BarChart2, label: 'Relatórios' },
     ],

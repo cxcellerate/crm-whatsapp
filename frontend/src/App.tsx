@@ -10,6 +10,7 @@ import { SettingsPage } from './pages/SettingsPage';
 import { UsersPage } from './pages/UsersPage';
 import { QRCapturePage } from './pages/QRCapturePage';
 import { ReportsPage } from './pages/ReportsPage';
+import { AiAgentPage } from './pages/AiAgentPage';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const token = useAuthStore((s) => s.token);
@@ -35,6 +36,7 @@ export default function App() {
           <Route path="leads" element={<LeadsPage />} />
           <Route path="leads/:id" element={<LeadDetailPage />} />
           <Route path="users" element={<UsersPage />} />
+          <Route path="ai-agent" element={<AiAgentPage />} />
           <Route path="capture" element={<QRCapturePage />} />
           <Route path="reports" element={<ReportsPage />} />
           <Route path="settings" element={<SettingsPage />} />

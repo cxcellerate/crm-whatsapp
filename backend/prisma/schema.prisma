@@ -86,6 +86,7 @@ model Lead {
 
   messages   Message[]
   activities Activity[]
+  aiSessions AiAgentSession[]
 
   @@map("leads")
 }
@@ -171,6 +172,40 @@ model Setting {
   updatedAt DateTime @updatedAt
 
   @@map("settings")
+}
+
+// Sessão de conversa do agente de IA
+model AiAgentSession {
+  id            String          @id @default(uuid())
+  phone         String          @unique
+  leadId        String?
+  lead          Lead?           @relation(fields: [leadId], references: [id])
+  status        AiSessionStatus @default(ACTIVE)
+  extractedData Json            @default("{}")
+  turnCount     Int             @default(0)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  messages AiAgentMessage[]
+
+  @@map("ai_agent_sessions")
+}
+
+model AiAgentMessage {
+  id        String         @id @default(uuid())
+  sessionId String
+  session   AiAgentSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role      String
+  content   String
+  createdAt DateTime       @default(now())
+
+  @@map("ai_agent_messages")
+}
+
+enum AiSessionStatus {
+  ACTIVE
+  COMPLETED
+  ABANDONED
 }
 
 model FormCapture {
