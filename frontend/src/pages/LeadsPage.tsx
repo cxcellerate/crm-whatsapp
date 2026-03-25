@@ -12,7 +12,7 @@ import { ptBR } from 'date-fns/locale';
 
 const SOURCE_COLORS: Record<string, string> = {
   MANUAL: '#6366f1', FORM: '#3b82f6', WHATSAPP: '#22c55e',
-  GOOGLE_ADS: '#f59e0b', META_ADS: '#8b5cf6', ORGANIC: '#14b8a6', REFERRAL: '#f43f5e',
+  GOOGLE_ADS: '#14b8a6', META_ADS: '#8b5cf6', ORGANIC: '#14b8a6', REFERRAL: '#f43f5e',
 };
 const SOURCE_LABELS: Record<string, string> = {
   MANUAL: 'Manual', FORM: 'Formulário', WHATSAPP: 'WhatsApp',

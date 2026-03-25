@@ -37,7 +37,7 @@ export function SettingsPage() {
     setStageModalOpen(false);
   }
 
-  const COLORS = ['#6366f1', '#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6', '#f43f5e', '#f97316'];
+  const COLORS = ['#6366f1', '#3b82f6', '#22c55e', '#14b8a6', '#ef4444', '#8b5cf6', '#14b8a6', '#f43f5e', '#f97316'];
 
   return (
     <div className="space-y-6 max-w-3xl">

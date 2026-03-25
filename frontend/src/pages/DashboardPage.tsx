@@ -8,7 +8,7 @@ import {
   Tooltip, ResponsiveContainer, CartesianGrid,
 } from 'recharts';
 
-const COLORS = ['#14b8a6', '#3b82f6', '#22c55e', '#8b5cf6', '#f43f5e', '#f59e0b'];
+const COLORS = ['#14b8a6', '#3b82f6', '#22c55e', '#8b5cf6', '#f43f5e', '#14b8a6'];
 
 const SOURCE_LABELS: Record<string, string> = {
   MANUAL: 'Manual', FORM: 'Formulário', WHATSAPP: 'WhatsApp',

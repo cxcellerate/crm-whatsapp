@@ -152,7 +152,7 @@ ${leads
         {[
           { label: 'Total de leads', value: leads.length, icon: Users, color: '#3b82f6' },
           { label: 'Este mês', value: stats?.leadsThisMonth ?? 0, icon: TrendingUp, color: '#22c55e' },
-          { label: 'Valor total', value: formatCurrency(leads.reduce((s: number, l: Lead) => s + (l.value || 0), 0)), icon: BarChart2, color: '#f59e0b' },
+          { label: 'Valor total', value: formatCurrency(leads.reduce((s: number, l: Lead) => s + (l.value || 0), 0)), icon: BarChart2, color: '#14b8a6' },
           { label: 'Ticket médio', value: leads.filter((l: Lead) => l.value).length > 0 ? formatCurrency(leads.reduce((s: number, l: Lead) => s + (l.value || 0), 0) / leads.filter((l: Lead) => l.value).length) : 'R$ 0', icon: TrendingUp, color: '#8b5cf6' },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="card p-5">
@@ -173,8 +173,8 @@ ${leads
             <CartesianGrid strokeDasharray="3 3" stroke="#2d2d2d" />
             <XAxis dataKey="date" tick={{ fill: '#737373', fontSize: 10 }} tickLine={false} interval={4} />
             <YAxis tick={{ fill: '#737373', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
-            <Tooltip contentStyle={{ background: '#1f1f1f', border: '1px solid #2d2d2d', borderRadius: 8 }} cursor={{ stroke: '#f59f0a', strokeWidth: 1 }} />
-            <Line type="monotone" dataKey="leads" stroke="#f59f0a" strokeWidth={2} dot={false} name="Leads" />
+            <Tooltip contentStyle={{ background: '#1f1f1f', border: '1px solid #2d2d2d', borderRadius: 8 }} cursor={{ stroke: '#14b8a6', strokeWidth: 1 }} />
+            <Line type="monotone" dataKey="leads" stroke="#14b8a6" strokeWidth={2} dot={false} name="Leads" />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -189,7 +189,7 @@ ${leads
                 <XAxis type="number" tick={{ fill: '#737373', fontSize: 10 }} axisLine={false} tickLine={false} />
                 <YAxis type="category" dataKey="name" tick={{ fill: '#a3a3a3', fontSize: 11 }} width={90} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={{ background: '#1f1f1f', border: '1px solid #2d2d2d', borderRadius: 8 }} />
-                <Bar dataKey="leads" fill="#f59f0a" radius={[0, 6, 6, 0]} name="Leads" />
+                <Bar dataKey="leads" fill="#14b8a6" radius={[0, 6, 6, 0]} name="Leads" />
               </BarChart>
             </ResponsiveContainer>
           ) : (
