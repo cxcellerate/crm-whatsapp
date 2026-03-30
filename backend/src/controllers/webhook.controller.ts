@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../utils/prisma';
 import { emitEvent, emitToRoom } from '../utils/socket';
-import { sendWhatsAppMessage } from '../services/whatsapp.service';
 import { isAgentEnabled, processAgentMessage } from '../services/ai-agent.service';
 import { logger } from '../utils/logger';
 
@@ -39,24 +38,12 @@ async function processInboundMessage(phone: string, content: string, waMessageId
   emitToRoom(`lead:${lead.id}`, 'message:new', inboundMessage);
   emitEvent('whatsapp:message', { lead, message: inboundMessage });
 
-  // Agente de IA responde automaticamente (se ativado)
+  // Agente SDK de IA responde automaticamente (se ativado)
+  // O agente gerencia envio, persistência e eventos internamente via tool_use
   try {
     const agentOn = await isAgentEnabled();
     if (agentOn) {
-      const reply = await processAgentMessage(phone, content, lead.id);
-      if (reply) {
-        const waResult = await sendWhatsAppMessage(phone, reply).catch(() => null);
-        const outbound = await prisma.message.create({
-          data: {
-            leadId: lead.id,
-            content: reply,
-            direction: 'OUTBOUND',
-            status: waResult ? 'SENT' : 'FAILED',
-            waMessageId: waResult?.key?.id,
-          },
-        });
-        emitToRoom(`lead:${lead.id}`, 'message:new', outbound);
-      }
+      await processAgentMessage(phone, content, lead.id);
     }
   } catch (err) {
     logger.error(`[Webhook] Erro no agente de IA: ${err}`);
