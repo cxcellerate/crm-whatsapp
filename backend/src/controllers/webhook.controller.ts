@@ -51,7 +51,7 @@ async function processInboundMessage(phone: string, content: string, waMessageId
 }
 
 // ─── Evolution API ─────────────────────────────────────────────────────────────
-export function receiveWhatsApp(req: Request, res: Response) {
+export async function receiveWhatsApp(req: Request, res: Response) {
   const { data, event } = req.body;
   if (event !== 'messages.upsert') return res.sendStatus(200);
 
@@ -62,14 +62,15 @@ export function receiveWhatsApp(req: Request, res: Response) {
   const content = msg.message?.conversation || msg.message?.extendedTextMessage?.text || '';
   if (!phone || !content) return res.sendStatus(200);
 
-  res.sendStatus(200); // responde imediatamente — processamento em background
-  processInboundMessage(phone, content, msg.key.id).catch((err) =>
+  // Responde imediatamente ao WhatsApp; await mantém a função serverless viva até o agente terminar
+  res.sendStatus(200);
+  await processInboundMessage(phone, content, msg.key.id).catch((err) =>
     logger.error(`Webhook Evolution processInboundMessage error: ${err}`)
   );
 }
 
 // ─── Z-API ─────────────────────────────────────────────────────────────────────
-export function receiveZapi(req: Request, res: Response) {
+export async function receiveZapi(req: Request, res: Response) {
   const body = req.body;
   if (body.fromMe === true) return res.sendStatus(200);
 
@@ -82,8 +83,9 @@ export function receiveZapi(req: Request, res: Response) {
   const messageId = body.messageId || body.zaapId;
   if (!phone || !content) return res.sendStatus(200);
 
-  res.sendStatus(200); // responde imediatamente — processamento em background
-  processInboundMessage(phone, content, messageId).catch((err) =>
+  // Responde imediatamente ao WhatsApp; await mantém a função serverless viva até o agente terminar
+  res.sendStatus(200);
+  await processInboundMessage(phone, content, messageId).catch((err) =>
     logger.error(`Webhook Z-API processInboundMessage error: ${err}`)
   );
 }
