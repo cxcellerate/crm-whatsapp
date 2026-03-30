@@ -51,45 +51,41 @@ async function processInboundMessage(phone: string, content: string, waMessageId
 }
 
 // ─── Evolution API ─────────────────────────────────────────────────────────────
-export async function receiveWhatsApp(req: Request, res: Response) {
-  try {
-    const { data, event } = req.body;
-    if (event !== 'messages.upsert') return res.sendStatus(200);
+export function receiveWhatsApp(req: Request, res: Response) {
+  const { data, event } = req.body;
+  if (event !== 'messages.upsert') return res.sendStatus(200);
 
-    const msg = data?.messages?.[0];
-    if (!msg || msg.key?.fromMe) return res.sendStatus(200);
+  const msg = data?.messages?.[0];
+  if (!msg || msg.key?.fromMe) return res.sendStatus(200);
 
-    const phone = msg.key.remoteJid?.replace('@s.whatsapp.net', '').replace(/\D/g, '');
-    const content = msg.message?.conversation || msg.message?.extendedTextMessage?.text || '';
+  const phone = msg.key.remoteJid?.replace('@s.whatsapp.net', '').replace(/\D/g, '');
+  const content = msg.message?.conversation || msg.message?.extendedTextMessage?.text || '';
+  if (!phone || !content) return res.sendStatus(200);
 
-    res.sendStatus(200); // responde imediatamente ao WhatsApp
-    await processInboundMessage(phone, content, msg.key.id);
-  } catch (err) {
-    logger.error(`Webhook Evolution error: ${err}`);
-    res.sendStatus(500);
-  }
+  res.sendStatus(200); // responde imediatamente — processamento em background
+  processInboundMessage(phone, content, msg.key.id).catch((err) =>
+    logger.error(`Webhook Evolution processInboundMessage error: ${err}`)
+  );
 }
 
 // ─── Z-API ─────────────────────────────────────────────────────────────────────
-export async function receiveZapi(req: Request, res: Response) {
-  try {
-    const body = req.body;
-    if (body.fromMe === true) return res.sendStatus(200);
+export function receiveZapi(req: Request, res: Response) {
+  const body = req.body;
+  if (body.fromMe === true) return res.sendStatus(200);
 
-    const type: string = body.type || '';
-    if (!['ReceivedCallback'].includes(type) && !body.text) return res.sendStatus(200);
+  const type: string = body.type || '';
+  if (!['ReceivedCallback'].includes(type) && !body.text) return res.sendStatus(200);
 
-    const rawPhone = (body.phone || body.chatId || '').replace(/\D/g, '');
-    const phone = rawPhone.startsWith('55') ? rawPhone : `55${rawPhone}`;
-    const content = body.text?.message || body.caption || body.body || '';
-    const messageId = body.messageId || body.zaapId;
+  const rawPhone = (body.phone || body.chatId || '').replace(/\D/g, '');
+  const phone = rawPhone.startsWith('55') ? rawPhone : `55${rawPhone}`;
+  const content = body.text?.message || body.caption || body.body || '';
+  const messageId = body.messageId || body.zaapId;
+  if (!phone || !content) return res.sendStatus(200);
 
-    res.sendStatus(200); // responde imediatamente
-    await processInboundMessage(phone, content, messageId);
-  } catch (err) {
-    logger.error(`Webhook Z-API error: ${err}`);
-    res.sendStatus(500);
-  }
+  res.sendStatus(200); // responde imediatamente — processamento em background
+  processInboundMessage(phone, content, messageId).catch((err) =>
+    logger.error(`Webhook Z-API processInboundMessage error: ${err}`)
+  );
 }
 
 // ─── Formulário externo ────────────────────────────────────────────────────────
