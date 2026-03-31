@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Bot, MessageSquare, CheckCircle, Clock, XCircle, ChevronRight, ToggleLeft, ToggleRight, Save, Eye } from 'lucide-react';
 import { api } from '../services/api';
@@ -36,8 +36,11 @@ export function AiAgentPage() {
   const { data: config } = useQuery({
     queryKey: ['ai-config'],
     queryFn: () => api.get('/ai-agent/config').then((r) => r.data),
-    onSuccess: (d: any) => setConfigForm((prev) => ({ ...prev, ...d })),
-  } as any);
+  });
+
+  useEffect(() => {
+    if (config) setConfigForm((prev) => ({ ...prev, ...config }));
+  }, [config]);
 
   const saveConfig = useMutation({
     mutationFn: (data: typeof configForm) => api.post('/ai-agent/config', data),
