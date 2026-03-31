@@ -5,14 +5,14 @@ import { logger } from '../utils/logger';
 // ─── Clients ─────────────────────────────────────────────────────────────────
 
 function getQStash() {
-  const token = process.env.QSTASH_TOKEN;
+  const token = process.env.QSTASH_TOKEN?.trim();
   if (!token) throw new Error('QSTASH_TOKEN não definido');
   return new QStashClient({ token });
 }
 
 function getRedis() {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const url = process.env.UPSTASH_REDIS_REST_URL?.trim();
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN?.trim();
   if (!url || !token) throw new Error('UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN não definidos');
   return new Redis({ url, token });
 }
@@ -50,8 +50,8 @@ export async function isMessageDuplicate(messageId: string): Promise<boolean> {
  * Lança erro se a assinatura for inválida.
  */
 export async function verifyQStashSignature(signature: string, body: string): Promise<void> {
-  const currentKey = process.env.QSTASH_CURRENT_SIGNING_KEY;
-  const nextKey = process.env.QSTASH_NEXT_SIGNING_KEY;
+  const currentKey = process.env.QSTASH_CURRENT_SIGNING_KEY?.trim();
+  const nextKey = process.env.QSTASH_NEXT_SIGNING_KEY?.trim();
   if (!currentKey || !nextKey) {
     logger.warn('[Upstash] QSTASH signing keys ausentes — verificação pulada');
     return;
