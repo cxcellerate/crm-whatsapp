@@ -11,8 +11,8 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 const SOURCE_COLORS: Record<string, string> = {
-  MANUAL: '#6366f1', FORM: '#3b82f6', WHATSAPP: '#22c55e',
-  GOOGLE_ADS: '#14b8a6', META_ADS: '#8b5cf6', ORGANIC: '#14b8a6', REFERRAL: '#f43f5e',
+  MANUAL: '#3DA13E', FORM: '#086375', WHATSAPP: '#BDFD29',
+  GOOGLE_ADS: '#FF7919', META_ADS: '#086375', ORGANIC: '#007F5F', REFERRAL: '#FF7919',
 };
 const SOURCE_LABELS: Record<string, string> = {
   MANUAL: 'Manual', FORM: 'Formulário', WHATSAPP: 'WhatsApp',

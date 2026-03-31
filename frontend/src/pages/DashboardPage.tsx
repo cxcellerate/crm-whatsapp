@@ -8,7 +8,7 @@ import {
   Tooltip, ResponsiveContainer, CartesianGrid,
 } from 'recharts';
 
-const COLORS = ['#14b8a6', '#3b82f6', '#22c55e', '#8b5cf6', '#f43f5e', '#14b8a6'];
+const COLORS = ['#3DA13E', '#086375', '#BDFD29', '#FF7919', '#007F5F', '#4D4D4D'];
 
 const SOURCE_LABELS: Record<string, string> = {
   MANUAL: 'Manual', FORM: 'Formulário', WHATSAPP: 'WhatsApp',
@@ -39,14 +39,14 @@ export function DashboardPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <StatsCard label="Total de Leads" value={stats?.totalLeads ?? '—'} icon={Users} color="#3b82f6" />
-        <StatsCard label="Leads este mês" value={stats?.leadsThisMonth ?? '—'} icon={TrendingUp} color="#22c55e" />
-        <StatsCard label="Mensagens (semana)" value={stats?.recentMessages ?? '—'} icon={MessageSquare} color="#14b8a6" />
+        <StatsCard label="Total de Leads" value={stats?.totalLeads ?? '—'} icon={Users} color="#086375" />
+        <StatsCard label="Leads este mês" value={stats?.leadsThisMonth ?? '—'} icon={TrendingUp} color="#3DA13E" />
+        <StatsCard label="Mensagens (semana)" value={stats?.recentMessages ?? '—'} icon={MessageSquare} color="#BDFD29" />
         <StatsCard
           label="Valor total"
           value={stats?.totalValue != null ? formatCurrency(stats.totalValue) : '—'}
           icon={DollarSign}
-          color="#8b5cf6"
+          color="#FF7919"
         />
       </div>
 
@@ -107,7 +107,7 @@ export function DashboardPage() {
                   contentStyle={{ background: '#1f1f1f', border: '1px solid #2d2d2d', borderRadius: 8 }}
                   cursor={{ fill: '#2d2d2d' }}
                 />
-                <Bar dataKey="_count._all" fill="#14b8a6" radius={[6, 6, 0, 0]} name="Leads" />
+                <Bar dataKey="_count._all" fill="#3DA13E" radius={[6, 6, 0, 0]} name="Leads" />
               </BarChart>
             </ResponsiveContainer>
           ) : (

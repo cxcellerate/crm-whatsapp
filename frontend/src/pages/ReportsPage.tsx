@@ -150,10 +150,10 @@ ${leads
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total de leads', value: leads.length, icon: Users, color: '#3b82f6' },
-          { label: 'Este mês', value: stats?.leadsThisMonth ?? 0, icon: TrendingUp, color: '#22c55e' },
-          { label: 'Valor total', value: formatCurrency(leads.reduce((s: number, l: Lead) => s + (l.value || 0), 0)), icon: BarChart2, color: '#14b8a6' },
-          { label: 'Ticket médio', value: leads.filter((l: Lead) => l.value).length > 0 ? formatCurrency(leads.reduce((s: number, l: Lead) => s + (l.value || 0), 0) / leads.filter((l: Lead) => l.value).length) : 'R$ 0', icon: TrendingUp, color: '#8b5cf6' },
+          { label: 'Total de leads', value: leads.length, icon: Users, color: '#086375' },
+          { label: 'Este mês', value: stats?.leadsThisMonth ?? 0, icon: TrendingUp, color: '#3DA13E' },
+          { label: 'Valor total', value: formatCurrency(leads.reduce((s: number, l: Lead) => s + (l.value || 0), 0)), icon: BarChart2, color: '#BDFD29' },
+          { label: 'Ticket médio', value: leads.filter((l: Lead) => l.value).length > 0 ? formatCurrency(leads.reduce((s: number, l: Lead) => s + (l.value || 0), 0) / leads.filter((l: Lead) => l.value).length) : 'R$ 0', icon: TrendingUp, color: '#FF7919' },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="card p-5">
             <div className="flex items-center justify-between mb-2">
@@ -173,8 +173,8 @@ ${leads
             <CartesianGrid strokeDasharray="3 3" stroke="#2d2d2d" />
             <XAxis dataKey="date" tick={{ fill: '#737373', fontSize: 10 }} tickLine={false} interval={4} />
             <YAxis tick={{ fill: '#737373', fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
-            <Tooltip contentStyle={{ background: '#1f1f1f', border: '1px solid #2d2d2d', borderRadius: 8 }} cursor={{ stroke: '#14b8a6', strokeWidth: 1 }} />
-            <Line type="monotone" dataKey="leads" stroke="#14b8a6" strokeWidth={2} dot={false} name="Leads" />
+            <Tooltip contentStyle={{ background: '#1f1f1f', border: '1px solid #2d2d2d', borderRadius: 8 }} cursor={{ stroke: '#3DA13E', strokeWidth: 1 }} />
+            <Line type="monotone" dataKey="leads" stroke="#3DA13E" strokeWidth={2} dot={false} name="Leads" />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -189,7 +189,7 @@ ${leads
                 <XAxis type="number" tick={{ fill: '#737373', fontSize: 10 }} axisLine={false} tickLine={false} />
                 <YAxis type="category" dataKey="name" tick={{ fill: '#a3a3a3', fontSize: 11 }} width={90} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={{ background: '#1f1f1f', border: '1px solid #2d2d2d', borderRadius: 8 }} />
-                <Bar dataKey="leads" fill="#14b8a6" radius={[0, 6, 6, 0]} name="Leads" />
+                <Bar dataKey="leads" fill="#3DA13E" radius={[0, 6, 6, 0]} name="Leads" />
               </BarChart>
             </ResponsiveContainer>
           ) : (
@@ -206,7 +206,7 @@ ${leads
                 <XAxis type="number" tick={{ fill: '#737373', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => formatCurrency(v)} />
                 <YAxis type="category" dataKey="name" tick={{ fill: '#a3a3a3', fontSize: 11 }} width={90} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={{ background: '#1f1f1f', border: '1px solid #2d2d2d', borderRadius: 8 }} formatter={(v: any) => formatCurrency(v)} />
-                <Bar dataKey="value" fill="#8b5cf6" radius={[0, 6, 6, 0]} name="Valor" />
+                <Bar dataKey="value" fill="#FF7919" radius={[0, 6, 6, 0]} name="Valor" />
               </BarChart>
             </ResponsiveContainer>
           ) : (
@@ -232,7 +232,7 @@ ${leads
             {Object.entries(
               leads.reduce((acc: Record<string, { name: string; color: string; leads: Lead[] }>, lead: Lead) => {
                 const key = lead.stageId;
-                if (!acc[key]) acc[key] = { name: lead.stage?.name || 'Sem etapa', color: lead.stage?.color || '#6366f1', leads: [] };
+                if (!acc[key]) acc[key] = { name: lead.stage?.name || 'Sem etapa', color: lead.stage?.color || '#3DA13E', leads: [] };
                 acc[key].leads.push(lead);
                 return acc;
               }, {})

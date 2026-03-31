@@ -11,7 +11,7 @@ import toast from 'react-hot-toast';
 export function SettingsPage() {
   const [newPipelineName, setNewPipelineName] = useState('');
   const [newStageName, setNewStageName] = useState('');
-  const [newStageColor, setNewStageColor] = useState('#6366f1');
+  const [newStageColor, setNewStageColor] = useState('#3DA13E');
   const [selectedPipelineId, setSelectedPipelineId] = useState<string | null>(null);
   const [stageModalOpen, setStageModalOpen] = useState(false);
   const [deletingStage, setDeletingStage] = useState<{ pipelineId: string; stageId: string } | null>(null);
@@ -37,7 +37,7 @@ export function SettingsPage() {
     setStageModalOpen(false);
   }
 
-  const COLORS = ['#6366f1', '#3b82f6', '#22c55e', '#14b8a6', '#ef4444', '#8b5cf6', '#14b8a6', '#f43f5e', '#f97316'];
+  const COLORS = ['#3DA13E', '#BDFD29', '#086375', '#FF7919', '#007F5F', '#ef4444', '#4D4D4D'];
 
   return (
     <div className="space-y-6 max-w-3xl">

@@ -4,7 +4,7 @@ interface Props {
   variant?: 'solid' | 'soft';
 }
 
-export function Badge({ children, color = '#6366f1', variant = 'soft' }: Props) {
+export function Badge({ children, color = '#3DA13E', variant = 'soft' }: Props) {
   const style =
     variant === 'soft'
       ? { backgroundColor: color + '22', color }
