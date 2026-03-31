@@ -2,6 +2,18 @@ import { Client as QStashClient, Receiver } from '@upstash/qstash';
 import { Redis } from '@upstash/redis';
 import { logger } from '../utils/logger';
 
+// Sanitiza env vars do Upstash antes que qualquer SDK as leia diretamente
+const _upstashEnvKeys = [
+  'UPSTASH_REDIS_REST_URL',
+  'UPSTASH_REDIS_REST_TOKEN',
+  'QSTASH_TOKEN',
+  'QSTASH_CURRENT_SIGNING_KEY',
+  'QSTASH_NEXT_SIGNING_KEY',
+];
+for (const key of _upstashEnvKeys) {
+  if (process.env[key]) process.env[key] = process.env[key]!.trim();
+}
+
 // ─── Clients ─────────────────────────────────────────────────────────────────
 
 function getQStash() {
