@@ -69,7 +69,7 @@ const AGENT_TOOLS: Anthropic.Tool[] = [
 async function getAgentConfig() {
   const settings = await prisma.setting.findMany({
     where: {
-      key: { in: ['ai_agent_enabled', 'ai_agent_api_key', 'ai_agent_max_turns', 'ai_agent_company_name'] },
+      key: { in: ['ai_agent_enabled', 'ai_agent_api_key', 'ai_agent_max_turns', 'ai_agent_company_name', 'ai_agent_instructions'] },
     },
   });
   const map = Object.fromEntries(settings.map((s) => [s.key, s.value]));
@@ -78,12 +78,16 @@ async function getAgentConfig() {
     apiKey: map['ai_agent_api_key'] || process.env.ANTHROPIC_API_KEY || '',
     maxTurns: parseInt(map['ai_agent_max_turns'] || '8', 10),
     companyName: map['ai_agent_company_name'] || 'nossa empresa',
+    instructions: map['ai_agent_instructions'] || '',
   };
 }
 
-function buildSystemPrompt(companyName: string, maxTurns: number, stages: string[]): string {
+function buildSystemPrompt(companyName: string, maxTurns: number, stages: string[], instructions: string): string {
   const stageList = stages.length > 0 ? stages.join(', ') : 'Novo Lead, Qualificado, Proposta';
-  return `Você é um agente de pré-atendimento da empresa "${companyName}". Seu papel é qualificar leads que chegam via WhatsApp de forma natural, amigável e eficiente.
+  const customBlock = instructions.trim()
+    ? `\n\nINSTRUÇÕES ESPECÍFICAS DA EMPRESA (seguir com prioridade):\n${instructions.trim()}`
+    : '';
+  return `Você é um agente de pré-atendimento da empresa "${companyName}". Seu papel é qualificar leads que chegam via WhatsApp de forma natural, amigável e eficiente.${customBlock}
 
 OBJETIVO: Coletar ao longo da conversa:
 - Nome completo
@@ -293,7 +297,7 @@ export async function processAgentMessage(phone: string, userMessage: string, le
   const stageNames = stages.map((s) => s.name);
 
   const anthropic = new Anthropic({ apiKey: config.apiKey });
-  const systemPrompt = buildSystemPrompt(config.companyName, config.maxTurns, stageNames);
+  const systemPrompt = buildSystemPrompt(config.companyName, config.maxTurns, stageNames, config.instructions);
 
   // Monta histórico de mensagens (simples user/assistant pairs)
   const currentMessages: Anthropic.MessageParam[] = history.map((m) => ({

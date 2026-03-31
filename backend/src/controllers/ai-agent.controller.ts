@@ -4,7 +4,7 @@ import { AppError } from '../middleware/error.middleware';
 import { prisma } from '../utils/prisma';
 import { getAgentSessions, getAgentSession, abandonSession } from '../services/ai-agent.service';
 
-const AI_KEYS = ['ai_agent_enabled', 'ai_agent_api_key', 'ai_agent_max_turns', 'ai_agent_company_name'];
+const AI_KEYS = ['ai_agent_enabled', 'ai_agent_api_key', 'ai_agent_max_turns', 'ai_agent_company_name', 'ai_agent_instructions'];
 
 export async function getSessions(req: AuthRequest, res: Response) {
   const page = parseInt(String(req.query.page || '1'));

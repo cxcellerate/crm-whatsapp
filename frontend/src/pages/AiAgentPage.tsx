@@ -23,6 +23,7 @@ export function AiAgentPage() {
     ai_agent_api_key: '',
     ai_agent_max_turns: '8',
     ai_agent_company_name: '',
+    ai_agent_instructions: '',
   });
   const qc = useQueryClient();
 
@@ -215,7 +216,7 @@ export function AiAgentPage() {
       )}
 
       {/* Modal — Configurar agente */}
-      <Modal open={configOpen} onClose={() => setConfigOpen(false)} title="Configurar Agente de IA" size="md">
+      <Modal open={configOpen} onClose={() => setConfigOpen(false)} title="Configurar Agente de IA" size="lg">
         <div className="space-y-4">
           {/* Toggle ativo */}
           <div className="flex items-center justify-between p-3 bg-dark-800 rounded-xl">
@@ -272,6 +273,24 @@ export function AiAgentPage() {
               onChange={(e) => setConfigForm({ ...configForm, ai_agent_max_turns: e.target.value })}
             />
             <p className="text-xs text-dark-600 mt-1">Após este número de trocas, o agente encerra e salva os dados (recomendado: 6–10)</p>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="label">Instruções personalizadas do agente</label>
+              <span className={`text-xs ${configForm.ai_agent_instructions.length > 4800 ? 'text-red-400' : 'text-dark-500'}`}>
+                {configForm.ai_agent_instructions.length}/5000
+              </span>
+            </div>
+            <textarea
+              className="input resize-none font-mono text-xs leading-relaxed"
+              rows={10}
+              maxLength={5000}
+              placeholder={`Descreva como o agente deve se comportar, o tom da conversa, produtos/serviços oferecidos, perguntas específicas a fazer, como qualificar o lead, o que NÃO perguntar, scripts de abertura, etc.\n\nExemplo:\n- Somos uma clínica odontológica especializada em implantes e estética dental\n- Cumprimente com "Olá! Sou a assistente virtual da Clínica Sorriso 😊"\n- Pergunte se é para consulta, orçamento ou dúvida\n- Colete nome e melhor horário para retorno\n- Não ofereça preços, apenas agende uma avaliação gratuita`}
+              value={configForm.ai_agent_instructions}
+              onChange={(e) => setConfigForm({ ...configForm, ai_agent_instructions: e.target.value })}
+            />
+            <p className="text-xs text-dark-600 mt-1">Estas instruções têm prioridade sobre o comportamento padrão do agente.</p>
           </div>
 
           <div className="bg-dark-800 rounded-lg p-3 text-xs text-dark-400 space-y-1">
