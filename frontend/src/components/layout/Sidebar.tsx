@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import {
-  LayoutDashboard, Kanban, Users, MessageSquare,
-  Settings, Zap, QrCode, BarChart2, UserCog, Bot,
+  LayoutDashboard, Kanban, Users,
+  Settings, QrCode, BarChart2, UserCog, Bot,
 } from 'lucide-react';
 import { WhatsAppStatus } from '../whatsapp/WhatsAppStatus';
 
@@ -35,16 +35,8 @@ export function Sidebar() {
   return (
     <aside className="w-64 bg-dark-900 border-r border-dark-700 flex flex-col">
       {/* Logo */}
-      <div className="p-5 border-b border-dark-700">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-brand-500 rounded-lg flex items-center justify-center shrink-0">
-            <Zap size={18} className="text-dark-900" />
-          </div>
-          <div>
-            <p className="font-bold text-dark-50 text-sm leading-tight">CRM WhatsApp</p>
-            <p className="text-brand-500 text-xs font-medium">by CXCellerate</p>
-          </div>
-        </div>
+      <div className="p-4 border-b border-dark-700">
+        <img src="/logo-mr.png" alt="Máquina de Resultados" className="h-10 w-auto" />
       </div>
 
       {/* Nav */}

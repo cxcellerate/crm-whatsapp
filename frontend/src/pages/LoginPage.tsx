@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Zap, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { api } from '../services/api';
 import { useAuthStore } from '../store/auth.store';
 import toast from 'react-hot-toast';
@@ -31,10 +31,7 @@ export function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-brand-500 rounded-2xl mb-4">
-            <Zap size={28} className="text-dark-900" />
-          </div>
-          <h1 className="text-2xl font-bold text-dark-50">CRM WhatsApp</h1>
+          <img src="/logo-mr.png" alt="Máquina de Resultados" className="h-14 w-auto mx-auto mb-4" />
           <p className="text-dark-400 text-sm mt-1">Entre na sua conta</p>
         </div>
 
