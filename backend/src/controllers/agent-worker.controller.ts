@@ -7,7 +7,7 @@ export async function agentWorkerHandler(req: Request, res: Response) {
   // Verifica assinatura do QStash
   try {
     const signature = req.headers['upstash-signature'] as string;
-    const bodyStr = JSON.stringify(req.body);
+    const bodyStr = (req as any).rawBody ?? JSON.stringify(req.body);
     await verifyQStashSignature(signature, bodyStr);
   } catch (err) {
     logger.error(`[Agent Worker] Assinatura QStash inválida: ${err}`);

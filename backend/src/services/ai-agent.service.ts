@@ -64,22 +64,38 @@ const AGENT_TOOLS: Anthropic.Tool[] = [
   },
 ];
 
-// ─── Config ──────────────────────────────────────────────────────────────────
+// ─── Config (com cache de 60s para reduzir queries no DB) ────────────────────
 
-async function getAgentConfig() {
+type AgentConfig = { enabled: boolean; apiKey: string; maxTurns: number; companyName: string; instructions: string };
+let _configCache: { data: AgentConfig; at: number } | null = null;
+let _stagesCache: { data: string[]; at: number } | null = null;
+const CONFIG_CACHE_TTL = 60_000;
+
+async function getAgentConfig(): Promise<AgentConfig> {
+  if (_configCache && Date.now() - _configCache.at < CONFIG_CACHE_TTL) return _configCache.data;
   const settings = await prisma.setting.findMany({
     where: {
       key: { in: ['ai_agent_enabled', 'ai_agent_api_key', 'ai_agent_max_turns', 'ai_agent_company_name', 'ai_agent_instructions'] },
     },
   });
   const map = Object.fromEntries(settings.map((s) => [s.key, s.value]));
-  return {
+  const data: AgentConfig = {
     enabled: map['ai_agent_enabled'] === 'true',
     apiKey: map['ai_agent_api_key'] || process.env.ANTHROPIC_API_KEY || '',
     maxTurns: parseInt(map['ai_agent_max_turns'] || '8', 10),
     companyName: map['ai_agent_company_name'] || 'nossa empresa',
     instructions: map['ai_agent_instructions'] || '',
   };
+  _configCache = { data, at: Date.now() };
+  return data;
+}
+
+async function getStageNames(): Promise<string[]> {
+  if (_stagesCache && Date.now() - _stagesCache.at < CONFIG_CACHE_TTL) return _stagesCache.data;
+  const stages = await prisma.stage.findMany({ select: { name: true }, orderBy: { order: 'asc' } });
+  const data = stages.map((s) => s.name);
+  _stagesCache = { data, at: Date.now() };
+  return data;
 }
 
 function buildSystemPrompt(companyName: string, maxTurns: number, stages: string[], instructions: string): string {
@@ -286,15 +302,14 @@ export async function processAgentMessage(phone: string, userMessage: string, le
     data: { sessionId: session.id, role: 'user', content: userMessage },
   });
 
-  // Carrega histórico (apenas pares user/assistant visíveis)
+  // Carrega histórico — últimas 20 mensagens para evitar contexto gigante
   const history = await prisma.aiAgentMessage.findMany({
     where: { sessionId: session.id },
-    orderBy: { createdAt: 'asc' },
-  });
+    orderBy: { createdAt: 'desc' },
+    take: 20,
+  }).then((msgs) => msgs.reverse());
 
-  // Busca etapas disponíveis para contextualizar o agente
-  const stages = await prisma.stage.findMany({ select: { name: true }, orderBy: { order: 'asc' } });
-  const stageNames = stages.map((s) => s.name);
+  const stageNames = await getStageNames();
 
   const anthropic = new Anthropic({ apiKey: config.apiKey });
   const systemPrompt = buildSystemPrompt(config.companyName, config.maxTurns, stageNames, config.instructions);
@@ -306,7 +321,7 @@ export async function processAgentMessage(phone: string, userMessage: string, le
   }));
 
   let sessionCompleted = false;
-  const MAX_TOOL_ITERATIONS = 10;
+  const MAX_TOOL_ITERATIONS = 5;
   let toolIterations = 0;
 
   // ── Agentic loop ──────────────────────────────────────────────────────────
