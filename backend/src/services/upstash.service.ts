@@ -1,4 +1,4 @@
-import { Client as QStashClient } from '@upstash/qstash';
+import { Client as QStashClient, Receiver } from '@upstash/qstash';
 import { Redis } from '@upstash/redis';
 import { logger } from '../utils/logger';
 
@@ -41,6 +41,23 @@ export async function isMessageDuplicate(messageId: string): Promise<boolean> {
     logger.error(`[Upstash Redis] Erro na deduplicação: ${err}`);
     return false;
   }
+}
+
+// ─── Verificação de assinatura QStash ────────────────────────────────────────
+
+/**
+ * Verifica a assinatura do QStash no header 'upstash-signature'.
+ * Lança erro se a assinatura for inválida.
+ */
+export async function verifyQStashSignature(signature: string, body: string): Promise<void> {
+  const currentKey = process.env.QSTASH_CURRENT_SIGNING_KEY;
+  const nextKey = process.env.QSTASH_NEXT_SIGNING_KEY;
+  if (!currentKey || !nextKey) {
+    logger.warn('[Upstash] QSTASH signing keys ausentes — verificação pulada');
+    return;
+  }
+  const receiver = new Receiver({ currentSigningKey: currentKey, nextSigningKey: nextKey });
+  await receiver.verify({ signature, body });
 }
 
 // ─── Fila de agente (QStash) ──────────────────────────────────────────────────
