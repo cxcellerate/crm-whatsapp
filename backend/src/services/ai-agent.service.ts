@@ -255,7 +255,14 @@ export async function isAgentEnabled(): Promise<boolean> {
 
 export async function processAgentMessage(phone: string, userMessage: string, leadId: string): Promise<void> {
   const config = await getAgentConfig();
-  if (!config.enabled || !config.apiKey) return;
+  if (!config.enabled) {
+    logger.warn('[AI Agent SDK] Agente desabilitado (ai_agent_enabled != true nas settings).');
+    return;
+  }
+  if (!config.apiKey) {
+    logger.warn('[AI Agent SDK] API key não configurada (ai_agent_api_key ausente nas settings e ANTHROPIC_API_KEY não definida).');
+    return;
+  }
 
   // Busca ou cria sessão
   let session = await prisma.aiAgentSession.findUnique({ where: { phone } });

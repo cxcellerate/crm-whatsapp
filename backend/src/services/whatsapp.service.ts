@@ -57,8 +57,9 @@ async function sendEvolution(phone: string, message: string, config: WhatsAppCon
   });
 
   const cleanPhone = phone.replace(/\D/g, '');
+  const numberWithCountry = cleanPhone.startsWith('55') ? cleanPhone : `55${cleanPhone}`;
   const response = await api.post(`/message/sendText/${instance}`, {
-    number: `55${cleanPhone}`,
+    number: numberWithCountry,
     options: { delay: 1200, presence: 'composing' },
     textMessage: { text: message },
   });
@@ -88,6 +89,7 @@ async function sendZapi(phone: string, message: string, config: WhatsAppConfig) 
   }
 
   const cleanPhone = phone.replace(/\D/g, '');
+  const numberWithCountry = cleanPhone.startsWith('55') ? cleanPhone : `55${cleanPhone}`;
   const api = axios.create({
     baseURL: `https://api.z-api.io/instances/${config.zapiInstanceId}/token/${config.zapiToken}`,
     headers: {
@@ -97,7 +99,7 @@ async function sendZapi(phone: string, message: string, config: WhatsAppConfig) 
   });
 
   const response = await api.post('/send-text', {
-    phone: `55${cleanPhone}`,
+    phone: numberWithCountry,
     message,
   });
 
