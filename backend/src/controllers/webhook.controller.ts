@@ -1,11 +1,15 @@
 import { Request, Response } from 'express';
 import { prisma } from '../utils/prisma';
 import { emitEvent, emitToRoom } from '../utils/socket';
-import { isAgentEnabled, processAgentMessage } from '../services/ai-agent.service';
+import { isAgentEnabled } from '../services/ai-agent.service';
+import { publishAgentJob, isMessageDuplicate } from '../services/upstash.service';
 import { logger } from '../utils/logger';
 
 async function processInboundMessage(phone: string, content: string, waMessageId?: string) {
   if (!phone || !content) return;
+
+  // Deduplicação: ignora se já processamos esta mensagem (Z-API pode reenviar)
+  if (waMessageId && await isMessageDuplicate(waMessageId)) return;
 
   let lead = await prisma.lead.findFirst({ where: { phone } });
 
@@ -38,15 +42,14 @@ async function processInboundMessage(phone: string, content: string, waMessageId
   emitToRoom(`lead:${lead.id}`, 'message:new', inboundMessage);
   emitEvent('whatsapp:message', { lead, message: inboundMessage });
 
-  // Agente SDK de IA responde automaticamente (se ativado)
-  // O agente gerencia envio, persistência e eventos internamente via tool_use
+  // Publica job no QStash — o agente roda em /api/agent-worker (fora do timeout do webhook)
   try {
     const agentOn = await isAgentEnabled();
     if (agentOn) {
-      await processAgentMessage(phone, content, lead.id);
+      await publishAgentJob({ phone, content, leadId: lead.id });
     }
   } catch (err) {
-    logger.error(`[Webhook] Erro no agente de IA: ${err}`);
+    logger.error(`[Webhook] Erro ao publicar job do agente: ${err}`);
   }
 }
 
