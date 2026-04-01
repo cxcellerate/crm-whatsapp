@@ -111,7 +111,7 @@ model Message {
   type        MessageType   @default(TEXT)
   direction   Direction     @default(OUTBOUND)
   status      MessageStatus @default(SENT)
-  waMessageId String?
+  waMessageId String? @unique
   mediaUrl    String?
   createdAt   DateTime      @default(now())
 

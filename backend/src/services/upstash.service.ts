@@ -56,8 +56,9 @@ export async function acquireProcessingLock(phone: string): Promise<boolean> {
     const redis = getRedis();
     const result = await redis.set(`crm:lock:${phone}`, '1', { nx: true, ex: LOCK_TTL_SECONDS });
     return result !== null;
-  } catch {
-    return true; // Redis indisponível → deixa processar (não bloqueia)
+  } catch (err) {
+    logger.error(`[Upstash Redis] Falha ao adquirir lock para ${phone}: ${err}`);
+    return false; // Redis indisponível → bloqueia, QStash vai retentar
   }
 }
 
