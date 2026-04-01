@@ -65,11 +65,11 @@ export async function receiveWhatsApp(req: Request, res: Response) {
   const content = msg.message?.conversation || msg.message?.extendedTextMessage?.text || '';
   if (!phone || !content) return res.sendStatus(200);
 
-  // Responde imediatamente ao WhatsApp; await mantém a função serverless viva até o agente terminar
-  res.sendStatus(200);
+  // Processa ANTES de responder — garante que o job QStash é publicado antes da função encerrar
   await processInboundMessage(phone, content, msg.key.id).catch((err) =>
     logger.error(`Webhook Evolution processInboundMessage error: ${err}`)
   );
+  res.sendStatus(200);
 }
 
 // ─── Z-API ─────────────────────────────────────────────────────────────────────
@@ -86,11 +86,10 @@ export async function receiveZapi(req: Request, res: Response) {
   const messageId = body.messageId || body.zaapId;
   if (!phone || !content) return res.sendStatus(200);
 
-  // Responde imediatamente ao WhatsApp; await mantém a função serverless viva até o agente terminar
-  res.sendStatus(200);
   await processInboundMessage(phone, content, messageId).catch((err) =>
     logger.error(`Webhook Z-API processInboundMessage error: ${err}`)
   );
+  res.sendStatus(200);
 }
 
 // ─── Formulário externo ────────────────────────────────────────────────────────
