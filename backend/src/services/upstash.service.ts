@@ -106,7 +106,7 @@ export async function publishAgentJob(payload: AgentJobPayload): Promise<void> {
   await qstash.publishJSON({
     url: workerUrl,
     body: payload,
-    retries: 3,
+    retries: 5,
     headers: secret ? { Authorization: `Bearer ${secret}` } : undefined,
   });
 
