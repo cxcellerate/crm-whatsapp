@@ -343,6 +343,9 @@ export async function processAgentMessage(phone: string, userMessage: string, le
       });
     } catch (err) {
       logger.error(`[AI Agent SDK] Erro ao chamar Claude (iteração ${toolIterations}): ${err}`);
+      if (toolIterations === 1) {
+        await handleSendMessage(ctx, { message: 'Desculpe, tive um problema técnico no momento. Em breve um de nossos atendentes entrará em contato.' }).catch(() => null);
+      }
       break;
     }
 

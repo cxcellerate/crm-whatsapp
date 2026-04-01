@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Bot, MessageSquare, CheckCircle, Clock, XCircle, ChevronRight, ToggleLeft, ToggleRight, Save, Eye } from 'lucide-react';
 import { api } from '../services/api';
@@ -18,6 +18,7 @@ const STATUS_CONFIG = {
 export function AiAgentPage() {
   const [configOpen, setConfigOpen] = useState(false);
   const [viewSession, setViewSession] = useState<any>(null);
+  const formDirty = useRef(false);
   const [configForm, setConfigForm] = useState({
     ai_agent_enabled: 'false',
     ai_agent_api_key: '',
@@ -39,12 +40,13 @@ export function AiAgentPage() {
   });
 
   useEffect(() => {
-    if (config) setConfigForm((prev) => ({ ...prev, ...config }));
+    if (config && !formDirty.current) setConfigForm((prev) => ({ ...prev, ...config }));
   }, [config]);
 
   const saveConfig = useMutation({
     mutationFn: (data: typeof configForm) => api.post('/ai-agent/config', data),
     onSuccess: () => {
+      formDirty.current = false;
       qc.invalidateQueries({ queryKey: ['ai-config'] });
       toast.success('Configurações do agente salvas!');
       setConfigOpen(false);
@@ -64,6 +66,11 @@ export function AiAgentPage() {
     queryFn: () => api.get(`/ai-agent/sessions/${viewSession.id}`).then((r) => r.data),
     enabled: !!viewSession?.id,
   });
+
+  function updateForm(patch: Partial<typeof configForm>) {
+    formDirty.current = true;
+    setConfigForm((f) => ({ ...f, ...patch }));
+  }
 
   const agentEnabled = config?.ai_agent_enabled === 'true';
   const list = sessions?.sessions || [];
@@ -219,7 +226,7 @@ export function AiAgentPage() {
       )}
 
       {/* Modal — Configurar agente */}
-      <Modal open={configOpen} onClose={() => setConfigOpen(false)} title="Configurar Agente de IA" size="lg">
+      <Modal open={configOpen} onClose={() => { formDirty.current = false; setConfigOpen(false); }} title="Configurar Agente de IA" size="lg">
         <div className="space-y-4">
           {/* Toggle ativo */}
           <div className="flex items-center justify-between p-3 bg-dark-800 rounded-xl">
@@ -228,7 +235,7 @@ export function AiAgentPage() {
               <p className="text-dark-500 text-xs">Responde automaticamente mensagens do WhatsApp</p>
             </div>
             <button
-              onClick={() => setConfigForm((f) => ({ ...f, ai_agent_enabled: f.ai_agent_enabled === 'true' ? 'false' : 'true' }))}
+              onClick={() => updateForm({ ai_agent_enabled: configForm.ai_agent_enabled === 'true' ? 'false' : 'true' })}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm font-medium ${configForm.ai_agent_enabled === 'true' ? 'bg-green-500/20 text-green-400' : 'bg-dark-700 text-dark-400'}`}
             >
               {configForm.ai_agent_enabled === 'true' ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
@@ -242,7 +249,7 @@ export function AiAgentPage() {
               className="input"
               placeholder="Ex: Acme Soluções"
               value={configForm.ai_agent_company_name}
-              onChange={(e) => setConfigForm({ ...configForm, ai_agent_company_name: e.target.value })}
+              onChange={(e) => updateForm({ ai_agent_company_name: e.target.value })}
             />
             <p className="text-xs text-dark-600 mt-1">Usado pelo agente para se identificar na conversa</p>
           </div>
@@ -254,7 +261,7 @@ export function AiAgentPage() {
               type="password"
               placeholder="sk-ant-api03-..."
               value={configForm.ai_agent_api_key}
-              onChange={(e) => setConfigForm({ ...configForm, ai_agent_api_key: e.target.value })}
+              onChange={(e) => updateForm({ ai_agent_api_key: e.target.value })}
             />
             <p className="text-xs text-dark-600 mt-1">
               Obtenha em{' '}
@@ -273,7 +280,7 @@ export function AiAgentPage() {
               min="3"
               max="20"
               value={configForm.ai_agent_max_turns}
-              onChange={(e) => setConfigForm({ ...configForm, ai_agent_max_turns: e.target.value })}
+              onChange={(e) => updateForm({ ai_agent_max_turns: e.target.value })}
             />
             <p className="text-xs text-dark-600 mt-1">Após este número de trocas, o agente encerra e salva os dados (recomendado: 6–10)</p>
           </div>
@@ -291,7 +298,7 @@ export function AiAgentPage() {
               maxLength={5000}
               placeholder={`Descreva como o agente deve se comportar, o tom da conversa, produtos/serviços oferecidos, perguntas específicas a fazer, como qualificar o lead, o que NÃO perguntar, scripts de abertura, etc.\n\nExemplo:\n- Somos uma clínica odontológica especializada em implantes e estética dental\n- Cumprimente com "Olá! Sou a assistente virtual da Clínica Sorriso 😊"\n- Pergunte se é para consulta, orçamento ou dúvida\n- Colete nome e melhor horário para retorno\n- Não ofereça preços, apenas agende uma avaliação gratuita`}
               value={configForm.ai_agent_instructions}
-              onChange={(e) => setConfigForm({ ...configForm, ai_agent_instructions: e.target.value })}
+              onChange={(e) => updateForm({ ai_agent_instructions: e.target.value })}
             />
             <p className="text-xs text-dark-600 mt-1">Estas instruções têm prioridade sobre o comportamento padrão do agente.</p>
           </div>
@@ -309,7 +316,7 @@ export function AiAgentPage() {
           </div>
 
           <div className="flex gap-3 justify-end pt-1">
-            <button className="btn-secondary" onClick={() => setConfigOpen(false)}>Cancelar</button>
+            <button className="btn-secondary" onClick={() => { formDirty.current = false; setConfigOpen(false); }}>Cancelar</button>
             <button className="btn-primary" onClick={() => saveConfig.mutate(configForm)} disabled={saveConfig.isPending}>
               <Save size={15} />
               {saveConfig.isPending ? 'Salvando...' : 'Salvar configurações'}

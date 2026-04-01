@@ -7,6 +7,7 @@ export function useLeads(params?: Record<string, string>) {
   return useQuery<Lead[]>({
     queryKey: ['leads', params],
     queryFn: () => api.get('/leads', { params }).then((r) => r.data),
+    refetchInterval: 8_000,
   });
 }
 
@@ -15,6 +16,7 @@ export function useLead(id: string) {
     queryKey: ['lead', id],
     queryFn: () => api.get(`/leads/${id}`).then((r) => r.data),
     enabled: !!id,
+    refetchInterval: 8_000,
   });
 }
 

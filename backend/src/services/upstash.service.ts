@@ -49,7 +49,7 @@ export async function isMessageDuplicate(messageId: string): Promise<boolean> {
 
 // ─── Lock de processamento por phone (evita jobs concorrentes) ───────────────
 
-const LOCK_TTL_SECONDS = 120;
+const LOCK_TTL_SECONDS = 350;
 
 export async function acquireProcessingLock(phone: string): Promise<boolean> {
   try {
@@ -79,7 +79,11 @@ export async function releaseProcessingLock(phone: string): Promise<void> {
 export function verifyAgentWorkerToken(authHeader: string | undefined): boolean {
   const secret = process.env.AGENT_WORKER_SECRET?.trim();
   if (!secret) {
-    logger.warn('[Agent Worker] AGENT_WORKER_SECRET não definido — acesso liberado (configure em produção)');
+    if (process.env.NODE_ENV === 'production') {
+      logger.error('[Agent Worker] AGENT_WORKER_SECRET não definido em produção — acesso negado');
+      return false;
+    }
+    logger.warn('[Agent Worker] AGENT_WORKER_SECRET não definido — acesso liberado (apenas em dev)');
     return true;
   }
   return authHeader === `Bearer ${secret}`;
@@ -91,6 +95,7 @@ export interface AgentJobPayload {
   phone: string;
   content: string;
   leadId: string;
+  waMessageId?: string;
 }
 
 export async function publishAgentJob(payload: AgentJobPayload): Promise<void> {
@@ -107,6 +112,7 @@ export async function publishAgentJob(payload: AgentJobPayload): Promise<void> {
     url: workerUrl,
     body: payload,
     retries: 5,
+    deduplicationId: payload.waMessageId ? `agent:${payload.waMessageId}` : undefined,
     headers: secret ? { Authorization: `Bearer ${secret}` } : undefined,
   });
 

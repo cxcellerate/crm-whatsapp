@@ -46,7 +46,7 @@ async function processInboundMessage(phone: string, content: string, waMessageId
   try {
     const agentOn = await isAgentEnabled();
     if (agentOn) {
-      await publishAgentJob({ phone, content, leadId: lead.id });
+      await publishAgentJob({ phone, content, leadId: lead.id, waMessageId });
     }
   } catch (err) {
     logger.error(`[Webhook] Erro ao publicar job do agente: ${err}`);
@@ -63,7 +63,11 @@ export async function receiveWhatsApp(req: Request, res: Response) {
 
   const phone = msg.key.remoteJid?.replace('@s.whatsapp.net', '').replace(/\D/g, '');
   const content = msg.message?.conversation || msg.message?.extendedTextMessage?.text || '';
-  if (!phone || !content) return res.sendStatus(200);
+  if (!phone || !content) {
+    const msgType = msg.message ? Object.keys(msg.message)[0] : 'unknown';
+    if (phone) logger.warn(`[Webhook Evolution] Mensagem ignorada — tipo não suportado: ${msgType} (phone: ${phone})`);
+    return res.sendStatus(200);
+  }
 
   // Processa ANTES de responder — garante que o job QStash é publicado antes da função encerrar
   await processInboundMessage(phone, content, msg.key.id).catch((err) =>
@@ -84,7 +88,10 @@ export async function receiveZapi(req: Request, res: Response) {
   const phone = rawPhone.startsWith('55') ? rawPhone : `55${rawPhone}`;
   const content = body.text?.message || body.caption || body.body || '';
   const messageId = body.messageId || body.zaapId;
-  if (!phone || !content) return res.sendStatus(200);
+  if (!phone || !content) {
+    if (phone) logger.warn(`[Webhook Z-API] Mensagem ignorada — tipo: ${type}, sem conteúdo de texto (phone: ${phone})`);
+    return res.sendStatus(200);
+  }
 
   await processInboundMessage(phone, content, messageId).catch((err) =>
     logger.error(`Webhook Z-API processInboundMessage error: ${err}`)
