@@ -287,7 +287,11 @@ export async function processAgentMessage(phone: string, userMessage: string, le
   // Busca ou cria sessão
   let session = await prisma.aiAgentSession.findUnique({ where: { phone } });
 
-  if (session?.status === 'COMPLETED' || session?.status === 'ABANDONED') return;
+  // Sessão encerrada → cria nova para reiniciar o atendimento
+  if (session?.status === 'COMPLETED' || session?.status === 'ABANDONED') {
+    await prisma.aiAgentSession.delete({ where: { id: session.id } });
+    session = null;
+  }
 
   if (!session) {
     session = await prisma.aiAgentSession.create({ data: { phone, leadId } });
