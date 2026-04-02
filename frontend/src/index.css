@@ -2,14 +2,59 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Variáveis de tema ───────────────────────────────── */
+html.dark,
+html:not(.light) {
+  --bg-main:     #141414;
+  --bg-surface:  #1f1f1f;
+  --bg-surface2: #2d2d2d;
+  --bg-sidebar:  #0a0a0a;
+  --bg-header:   #0a0a0a;
+  --bd:          #3a3a3a;
+  --tx-1:        #ffffff;
+  --tx-2:        #e0e0e0;
+  --tx-3:        #b0b0b0;
+  --tx-4:        #666666;
+  --in-bg:       #2d2d2d;
+  --in-bd:       #444444;
+  --in-ph:       #737373;
+  --nav-hover-bg:#1f1f1f;
+  --nav-hover-tx:#ffffff;
+  --logo-filter: none;
+}
+
+html.light {
+  --bg-main:     #f5f6fa;
+  --bg-surface:  #ffffff;
+  --bg-surface2: #eef0f5;
+  --bg-sidebar:  #ffffff;
+  --bg-header:   #ffffff;
+  --bd:          #e2e8f0;
+  --tx-1:        #111827;
+  --tx-2:        #374151;
+  --tx-3:        #6b7280;
+  --tx-4:        #9ca3af;
+  --in-bg:       #ffffff;
+  --in-bd:       #d1d5db;
+  --in-ph:       #9ca3af;
+  --nav-hover-bg:#f0f2f7;
+  --nav-hover-tx:#111827;
+  --logo-filter: drop-shadow(0 2px 8px rgba(61,161,62,0.35));
+}
+
+/* ── Base ────────────────────────────────────────────── */
 @layer base {
   * { box-sizing: border-box; }
   body {
-    @apply bg-dark-800 text-dark-50 font-sans antialiased;
+    background-color: var(--bg-main);
+    color: var(--tx-1);
+    font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
     margin: 0;
   }
 }
 
+/* ── Componentes ─────────────────────────────────────── */
 @layer components {
   .btn {
     @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
@@ -18,18 +63,36 @@
     @apply btn bg-brand-500 hover:bg-brand-400 text-dark-900;
   }
   .btn-secondary {
-    @apply btn bg-dark-600 hover:bg-dark-500 text-dark-100;
+    @apply btn;
+    background-color: var(--bg-surface2);
+    color: var(--tx-2);
+  }
+  .btn-secondary:hover {
+    background-color: var(--bd);
   }
   .btn-ghost {
-    @apply btn hover:bg-dark-600 text-dark-200;
+    @apply btn;
+    color: var(--tx-2);
+  }
+  .btn-ghost:hover {
+    background-color: var(--bg-surface2);
   }
   .card {
-    @apply bg-dark-700 rounded-xl border border-dark-600;
+    @apply rounded-xl border;
+    background-color: var(--bg-surface);
+    border-color: var(--bd);
   }
   .input {
-    @apply w-full bg-dark-600 border border-dark-500 rounded-lg px-3 py-2 text-dark-50 text-sm placeholder-dark-300 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition;
+    @apply w-full rounded-lg px-3 py-2 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent;
+    background-color: var(--in-bg);
+    border: 1px solid var(--in-bd);
+    color: var(--tx-1);
+  }
+  .input::placeholder {
+    color: var(--in-ph);
   }
   .label {
-    @apply block text-sm font-medium text-dark-200 mb-1;
+    @apply block text-sm font-medium mb-1;
+    color: var(--tx-3);
   }
 }

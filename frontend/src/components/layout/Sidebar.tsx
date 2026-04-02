@@ -3,6 +3,7 @@ import {
   LayoutDashboard, Kanban, Users,
   Settings, QrCode, BarChart2, UserCog, Bot,
 } from 'lucide-react';
+import { useThemeStore } from '../../store/theme.store';
 import { WhatsAppStatus } from '../whatsapp/WhatsAppStatus';
 
 const navGroups = [
@@ -32,18 +33,41 @@ const navGroups = [
 ];
 
 export function Sidebar() {
+  const { theme } = useThemeStore();
+  const isLight = theme === 'light';
+
   return (
-    <aside className="w-64 bg-dark-900 border-r border-dark-700 flex flex-col">
+    <aside
+      className="w-64 flex flex-col border-r"
+      style={{ backgroundColor: 'var(--bg-sidebar)', borderColor: 'var(--bd)' }}
+    >
       {/* Logo */}
-      <div className="p-4 border-b border-dark-700">
-        <img src="/logo-mr.png" alt="Máquina de Resultados" className="h-10 w-auto" />
+      <div
+        className="p-4 border-b flex items-center justify-center"
+        style={{
+          borderColor: 'var(--bd)',
+          backgroundColor: isLight ? '#ffffff' : 'transparent',
+          boxShadow: isLight ? '0 2px 8px rgba(61,161,62,0.10)' : 'none',
+        }}
+      >
+        <img
+          src="/logo-mr.png"
+          alt="Máquina de Resultados"
+          className="h-10 w-auto transition-all duration-300"
+          style={{ filter: 'var(--logo-filter)' }}
+        />
       </div>
 
       {/* Nav */}
       <nav className="flex-1 p-3 space-y-4 overflow-y-auto">
         {navGroups.map(({ label, items }) => (
           <div key={label}>
-            <p className="text-[10px] font-semibold text-dark-600 uppercase tracking-widest px-3 mb-1">{label}</p>
+            <p
+              className="text-[10px] font-semibold uppercase tracking-widest px-3 mb-1"
+              style={{ color: 'var(--tx-4)' }}
+            >
+              {label}
+            </p>
             <div className="space-y-0.5">
               {items.map(({ to, icon: Icon, label: itemLabel }) => (
                 <NavLink
@@ -51,11 +75,28 @@ export function Sidebar() {
                   to={to}
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-brand-500 text-dark-900'
-                        : 'text-dark-400 hover:bg-dark-800 hover:text-dark-100'
+                      isActive ? 'bg-brand-500 text-dark-900' : ''
                     }`
                   }
+                  style={({ isActive }) =>
+                    isActive
+                      ? {}
+                      : {
+                          color: 'var(--tx-3)',
+                        }
+                  }
+                  onMouseEnter={e => {
+                    if (!e.currentTarget.classList.contains('bg-brand-500')) {
+                      e.currentTarget.style.backgroundColor = 'var(--nav-hover-bg)';
+                      e.currentTarget.style.color = 'var(--nav-hover-tx)';
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (!e.currentTarget.classList.contains('bg-brand-500')) {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.color = 'var(--tx-3)';
+                    }
+                  }}
                 >
                   <Icon size={16} />
                   {itemLabel}
@@ -67,8 +108,8 @@ export function Sidebar() {
       </nav>
 
       {/* WhatsApp status */}
-      <div className="p-4 border-t border-dark-700">
-        <div className="px-3 py-2 bg-dark-800 rounded-lg">
+      <div className="p-4 border-t" style={{ borderColor: 'var(--bd)' }}>
+        <div className="px-3 py-2 rounded-lg" style={{ backgroundColor: 'var(--bg-surface2)' }}>
           <WhatsAppStatus />
         </div>
       </div>

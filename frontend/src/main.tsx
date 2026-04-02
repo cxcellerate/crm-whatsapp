@@ -5,6 +5,16 @@ import { Toaster } from 'react-hot-toast';
 import App from './App';
 import './index.css';
 
+// Aplica o tema salvo antes de renderizar (evita flash)
+const savedTheme = (() => {
+  try {
+    return JSON.parse(localStorage.getItem('crm-theme') || '{}')?.state?.theme || 'dark';
+  } catch {
+    return 'dark';
+  }
+})();
+document.documentElement.classList.add(savedTheme);
+
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 1000 * 60 } },
 });
