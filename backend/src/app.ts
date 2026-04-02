@@ -60,7 +60,7 @@ app.use('/api/ai-agent', aiAgentRoutes);
 app.use('/api/agent-worker', agentWorkerRoutes);
 
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', env: process.env.NODE_ENV, timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', env: process.env.NODE_ENV, timestamp: new Date().toISOString(), commit: 'fix-login-v3' });
 });
 
 app.get('/api/debug-login', async (req, res) => {
