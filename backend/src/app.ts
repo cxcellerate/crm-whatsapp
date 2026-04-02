@@ -17,7 +17,6 @@ import { settingsRoutes } from './routes/settings.routes';
 import { aiAgentRoutes } from './routes/ai-agent.routes';
 import { agentWorkerRoutes } from './routes/agent-worker.routes';
 import { errorHandler } from './middleware/error.middleware';
-import { prisma } from './utils/prisma';
 
 const app = express();
 
@@ -60,27 +59,7 @@ app.use('/api/ai-agent', aiAgentRoutes);
 app.use('/api/agent-worker', agentWorkerRoutes);
 
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', env: process.env.NODE_ENV, timestamp: new Date().toISOString(), commit: 'fix-login-v3' });
-});
-
-app.get('/api/debug-login', async (req, res) => {
-  if (req.query.token !== 'cxcellerate2026') return res.status(403).end();
-  try {
-    const bcrypt = await import('bcryptjs');
-    const user = await prisma.user.findUnique({ where: { email: 'admin@crmwhatsapp.com' } });
-    if (!user) return res.json({ step: 'user_not_found' });
-    const valid = await bcrypt.default.compare('admin123', user.password);
-    const jwt = await import('jsonwebtoken');
-    let tokenOk = false;
-    let tokenErr = '';
-    try {
-      jwt.default.sign({ test: 1 }, process.env.JWT_SECRET || '', { expiresIn: '1s' });
-      tokenOk = true;
-    } catch(e: any) { tokenErr = e.message; }
-    res.json({ step: 'ok', user_found: true, active: user.active, password_valid: valid, hash_len: user.password.length, jwt_secret_set: !!process.env.JWT_SECRET, jwt_sign_ok: tokenOk, jwt_err: tokenErr });
-  } catch (err: any) {
-    res.status(500).json({ step: 'error', message: err.message, stack: err.stack?.slice(0, 300) });
-  }
+  res.json({ status: 'ok', env: process.env.NODE_ENV, timestamp: new Date().toISOString() });
 });
 
 

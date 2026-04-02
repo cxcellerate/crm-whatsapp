@@ -51,6 +51,10 @@ export function AiAgentPage() {
       toast.success('Configurações do agente salvas!');
       setConfigOpen(false);
     },
+    onError: (err: any) => {
+      const msg = err?.response?.data?.error || err?.message || 'Erro ao salvar configurações';
+      toast.error(`Erro ao salvar: ${msg}`);
+    },
   });
 
   const abandonSession = useMutation({

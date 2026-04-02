@@ -32,15 +32,21 @@ export async function getConfig(_req: AuthRequest, res: Response) {
 
 export async function saveConfig(req: AuthRequest, res: Response) {
   const body = req.body as Record<string, string>;
+  if (!body || typeof body !== 'object') {
+    return res.status(400).json({ error: 'Body inválido' });
+  }
   const entries = Object.entries(body).filter(
-    ([key, val]) => AI_KEYS.includes(key) && val !== undefined && val !== '••••••••'
+    ([key, val]) => AI_KEYS.includes(key) && val !== undefined && val !== null && val !== '••••••••'
   );
+  if (entries.length === 0) {
+    return res.status(400).json({ error: 'Nenhum campo válido para salvar' });
+  }
   for (const [key, value] of entries) {
     await prisma.setting.upsert({
       where: { key },
-      update: { value },
-      create: { key, value },
+      update: { value: String(value) },
+      create: { key, value: String(value) },
     });
   }
-  res.json({ success: true });
+  res.json({ success: true, saved: entries.map(([k]) => k) });
 }
