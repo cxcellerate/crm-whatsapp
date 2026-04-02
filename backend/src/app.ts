@@ -62,18 +62,6 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', env: process.env.NODE_ENV, timestamp: new Date().toISOString() });
 });
 
-app.get('/api/debug-db', async (_req, res) => {
-  try {
-    const { prisma } = await import('./utils/prisma');
-    const bcrypt = await import('bcryptjs');
-    const user = await prisma.user.findUnique({ where: { email: 'admin@crmwhatsapp.com' } });
-    if (!user) return res.json({ ok: false, reason: 'user_not_found' });
-    const valid = await bcrypt.compare('admin123', user.password);
-    res.json({ ok: true, user_found: true, password_valid: valid, active: user.active });
-  } catch (err: any) {
-    res.status(500).json({ ok: false, error: err.message });
-  }
-});
 
 app.use(errorHandler);
 
