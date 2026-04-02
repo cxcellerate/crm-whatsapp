@@ -62,6 +62,18 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', env: process.env.NODE_ENV, timestamp: new Date().toISOString() });
 });
 
+app.get('/api/debug-db', async (_req, res) => {
+  try {
+    const { prisma } = await import('./utils/prisma');
+    const count = await prisma.user.count();
+    const dbUrl = process.env.DATABASE_URL || '';
+    const host = dbUrl.match(/@([^:\/]+)/)?.[1] || 'unknown';
+    res.json({ ok: true, users: count, db_host: host });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 app.use(errorHandler);
 
 export default app;
