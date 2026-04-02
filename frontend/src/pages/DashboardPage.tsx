@@ -22,7 +22,7 @@ export function DashboardPage() {
   const { data: stats } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: () => api.get('/dashboard/stats').then((r) => r.data),
-    refetchInterval: 30_000,
+    staleTime: 1000 * 60 * 5, // WebSocket invalida ao criar/mover leads
   });
 
   const sourceData = stats?.leadsBySource?.map((s: any) => ({

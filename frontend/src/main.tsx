@@ -16,7 +16,14 @@ const savedTheme = (() => {
 document.documentElement.classList.add(savedTheme);
 
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { staleTime: 1000 * 60 } },
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60,
+      refetchOnWindowFocus: false,
+      refetchIntervalInBackground: false,
+      retry: 1,
+    },
+  },
 });
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

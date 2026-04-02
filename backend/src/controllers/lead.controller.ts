@@ -38,10 +38,11 @@ export async function getLead(req: AuthRequest, res: Response) {
     include: {
       stage: { include: { pipeline: true } },
       user: { select: { id: true, name: true, avatar: true } },
-      messages: { orderBy: { createdAt: 'asc' } },
+      messages: { orderBy: { createdAt: 'asc' }, take: 100 },
       activities: {
         include: { user: { select: { id: true, name: true, avatar: true } } },
         orderBy: { createdAt: 'desc' },
+        take: 30,
       },
     },
   });

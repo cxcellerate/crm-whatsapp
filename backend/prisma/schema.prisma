@@ -89,6 +89,10 @@ model Lead {
   activities Activity[]
   aiSessions AiAgentSession[]
 
+  @@index([stageId])
+  @@index([assignedTo])
+  @@index([source])
+  @@index([createdAt])
   @@map("leads")
 }
 
@@ -112,10 +116,12 @@ model Message {
   type        MessageType   @default(TEXT)
   direction   Direction     @default(OUTBOUND)
   status      MessageStatus @default(SENT)
-  waMessageId String? @unique
+  waMessageId String?       @unique
   mediaUrl    String?
   createdAt   DateTime      @default(now())
 
+  @@index([leadId])
+  @@index([createdAt])
   @@map("messages")
 }
 
@@ -151,6 +157,7 @@ model Activity {
   content   String
   createdAt DateTime     @default(now())
 
+  @@index([leadId])
   @@map("activities")
 }
 
@@ -200,6 +207,7 @@ model AiAgentMessage {
   content   String
   createdAt DateTime       @default(now())
 
+  @@index([sessionId])
   @@map("ai_agent_messages")
 }
 

@@ -28,7 +28,7 @@ export function WhatsAppChat({ leadId, leadPhone }: Props) {
   const { data: messages = [] } = useQuery<Message[]>({
     queryKey: ['messages', leadId],
     queryFn: () => api.get(`/messages/${leadId}`).then((r) => r.data),
-    refetchInterval: 4_000,
+    staleTime: 1000 * 60 * 2, // WebSocket invalida ao chegar mensagem nova
   });
 
   const send = useMutation({
