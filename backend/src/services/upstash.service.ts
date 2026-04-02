@@ -113,7 +113,7 @@ export async function publishAgentJob(payload: AgentJobPayload): Promise<void> {
     url: workerUrl,
     body: payload,
     retries: 5,
-    deduplicationId: payload.waMessageId ? `agent:${payload.waMessageId}` : undefined,
+    deduplicationId: payload.waMessageId ? `agent_${payload.waMessageId.replace(/[^a-zA-Z0-9_-]/g, '_')}` : undefined,
     headers: secret ? { Authorization: `Bearer ${secret}` } : undefined,
   });
 
