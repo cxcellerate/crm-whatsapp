@@ -70,7 +70,14 @@ app.get('/api/debug-login', async (req, res) => {
     const user = await prisma.user.findUnique({ where: { email: 'admin@crmwhatsapp.com' } });
     if (!user) return res.json({ step: 'user_not_found' });
     const valid = await bcrypt.default.compare('admin123', user.password);
-    res.json({ step: 'ok', user_found: true, active: user.active, password_valid: valid, hash_len: user.password.length });
+    const jwt = await import('jsonwebtoken');
+    let tokenOk = false;
+    let tokenErr = '';
+    try {
+      jwt.default.sign({ test: 1 }, process.env.JWT_SECRET || '', { expiresIn: '1s' });
+      tokenOk = true;
+    } catch(e: any) { tokenErr = e.message; }
+    res.json({ step: 'ok', user_found: true, active: user.active, password_valid: valid, hash_len: user.password.length, jwt_secret_set: !!process.env.JWT_SECRET, jwt_sign_ok: tokenOk, jwt_err: tokenErr });
   } catch (err: any) {
     res.status(500).json({ step: 'error', message: err.message, stack: err.stack?.slice(0, 300) });
   }
