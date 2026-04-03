@@ -23,8 +23,10 @@ export async function agentWorkerHandler(req: Request, res: Response) {
   // Lock por phone — evita dois jobs rodando ao mesmo tempo para o mesmo lead
   const locked = await acquireProcessingLock(phone);
   if (!locked) {
-    logger.warn(`[Agent Worker] Lock ocupado para phone: ${phone} — QStash vai retentar`);
-    // 429 faz o QStash retentar com backoff (ao contrário de 200 que descarta)
+    logger.warn(`[Agent Worker] Lock ocupado para phone: ${phone} — QStash vai retentar em 30s`);
+    // Retry-After instrui o QStash a aguardar 30s antes de tentar novamente,
+    // cobrindo o tempo do agentic loop sem descartar a mensagem por backoff curto
+    res.set('Retry-After', '30');
     return res.status(429).json({ error: 'Processing in progress, retry later' });
   }
 

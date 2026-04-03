@@ -49,7 +49,9 @@ export async function isMessageDuplicate(messageId: string): Promise<boolean> {
 
 // ─── Lock de processamento por phone (evita jobs concorrentes) ───────────────
 
-const LOCK_TTL_SECONDS = 350;
+// TTL calibrado para cobrir o pior caso do agentic loop:
+// 5 iterações × (Claude Haiku ~3s + WhatsApp API ~2s) ≈ 25s + margem
+const LOCK_TTL_SECONDS = 90;
 
 export async function acquireProcessingLock(phone: string): Promise<boolean> {
   try {
@@ -58,7 +60,7 @@ export async function acquireProcessingLock(phone: string): Promise<boolean> {
     return result !== null;
   } catch (err) {
     logger.error(`[Upstash Redis] Falha ao adquirir lock para ${phone}: ${err}`);
-    return false; // Redis indisponível → bloqueia, QStash vai retentar
+    return false; // Redis indisponível → retorna 429, QStash vai retentar
   }
 }
 
@@ -67,7 +69,7 @@ export async function releaseProcessingLock(phone: string): Promise<void> {
     const redis = getRedis();
     await redis.del(`crm:lock:${phone}`);
   } catch {
-    // Ignora — lock expira sozinho em 120s
+    // Ignora — lock expira sozinho em 90s
   }
 }
 
