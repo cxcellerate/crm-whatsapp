@@ -13,21 +13,34 @@ export function StatsCard({ label, value, icon: Icon, color, trend, trendLabel }
   const up = trend !== undefined && trend >= 0;
 
   return (
-    <div className="card p-5 hover:border-dark-500 transition-colors">
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-dark-400 text-sm">{label}</p>
-        <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: color + '22' }}>
-          <Icon size={18} style={{ color }} />
+    <div
+      className="card p-5 flex flex-col justify-between hover:translate-y-[-1px] transition-all duration-200"
+      style={{ minHeight: '120px' }}
+    >
+      <div className="flex items-start justify-between">
+        <p className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--tx-4)' }}>
+          {label}
+        </p>
+        <div
+          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+          style={{ backgroundColor: color + '18', border: `1px solid ${color}28` }}
+        >
+          <Icon size={15} style={{ color }} />
         </div>
       </div>
-      <p className="text-2xl font-bold text-dark-50">{value}</p>
-      {trend !== undefined && (
-        <div className={`flex items-center gap-1 mt-2 text-xs font-medium ${up ? 'text-green-400' : 'text-red-400'}`}>
-          {up ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-          <span>{up ? '+' : ''}{trend}%</span>
-          {trendLabel && <span className="text-dark-500 font-normal">{trendLabel}</span>}
-        </div>
-      )}
+
+      <div>
+        <p className="text-3xl font-bold tabular-nums leading-none mt-3" style={{ color: 'var(--tx-1)' }}>
+          {value}
+        </p>
+        {trend !== undefined && (
+          <div className={`flex items-center gap-1 mt-2 text-xs font-medium ${up ? 'text-green-400' : 'text-red-400'}`}>
+            {up ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
+            <span>{up ? '+' : ''}{trend}%</span>
+            {trendLabel && <span className="font-normal" style={{ color: 'var(--tx-4)' }}>{trendLabel}</span>}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
