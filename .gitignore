@@ -3,6 +3,11 @@ dist/
 build/
 .env
 .env.local
+.env.*.local
+# frontend env vars (nunca versionar — podem conter VITE_* expostos no bundle)
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
 *.log
 .DS_Store
 Thumbs.db

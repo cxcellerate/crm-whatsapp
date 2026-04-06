@@ -3,6 +3,7 @@ import { Users, TrendingUp, MessageSquare, DollarSign } from 'lucide-react';
 import { api } from '../services/api';
 import { StatsCard } from '../components/dashboard/StatsCard';
 import { useSocket } from '../hooks/useSocket';
+import { LeadSource } from '../types';
 import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis,
   Tooltip, ResponsiveContainer, CartesianGrid,
@@ -10,25 +11,35 @@ import {
 
 const COLORS = ['#3DA13E', '#086375', '#BDFD29', '#FF7919', '#007F5F', '#4D4D4D'];
 
-const SOURCE_LABELS: Record<string, string> = {
+const SOURCE_LABELS: Record<LeadSource, string> = {
   MANUAL: 'Manual', FORM: 'Formulário', WHATSAPP: 'WhatsApp',
   GOOGLE_ADS: 'Google Ads', META_ADS: 'Meta Ads',
   ORGANIC: 'Orgânico', REFERRAL: 'Indicação',
 };
 
+interface DashboardStats {
+  totalLeads: number;
+  leadsThisMonth: number;
+  leadsThisWeek: number;
+  recentMessages: number;
+  totalValue: number;
+  leadsBySource: Array<{ source: LeadSource; _count: { _all: number } }>;
+  leadsByStage: Array<{ stageId: string; _count: { _all: number } }>;
+}
+
 export function DashboardPage() {
   useSocket(); // inicia conexão WebSocket global
 
-  const { data: stats } = useQuery({
+  const { data: stats } = useQuery<DashboardStats>({
     queryKey: ['dashboard-stats'],
     queryFn: () => api.get('/dashboard/stats').then((r) => r.data),
     staleTime: 1000 * 60 * 5, // WebSocket invalida ao criar/mover leads
   });
 
-  const sourceData = stats?.leadsBySource?.map((s: any) => ({
-    name: SOURCE_LABELS[s.source] || s.source,
+  const sourceData = stats?.leadsBySource?.map((s) => ({
+    name: SOURCE_LABELS[s.source] ?? s.source,
     value: s._count._all,
-  })) || [];
+  })) ?? [];
 
   const formatCurrency = (v: number) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
@@ -67,7 +78,7 @@ export function DashboardPage() {
                   dataKey="value"
                   paddingAngle={3}
                 >
-                  {sourceData.map((_: any, i: number) => (
+                  {sourceData.map((_, i) => (
                     <Cell key={i} fill={COLORS[i % COLORS.length]} />
                   ))}
                 </Pie>
@@ -84,7 +95,7 @@ export function DashboardPage() {
           )}
           {sourceData.length > 0 && (
             <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3">
-              {sourceData.map((item: any, i: number) => (
+              {sourceData.map((item, i) => (
                 <div key={item.name} className="flex items-center gap-1.5">
                   <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
                   <span className="text-xs text-dark-400">{item.name} ({item.value})</span>

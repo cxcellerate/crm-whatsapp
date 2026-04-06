@@ -17,7 +17,7 @@ import { KanbanColumn } from '../components/kanban/KanbanColumn';
 import { LeadCard } from '../components/leads/LeadCard';
 import { LeadModal } from '../components/leads/LeadModal';
 import { Spinner } from '../components/ui/Spinner';
-import { Lead } from '../types';
+import { Lead, Stage } from '../types';
 
 export function KanbanPage() {
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -32,7 +32,7 @@ export function KanbanPage() {
 
   const activeLead = leads.find((l: Lead) => l.id === activeId);
   const pipeline = pipelines[0];
-  const stages = pipeline?.stages?.slice().sort((a: any, b: any) => a.order - b.order) || [];
+  const stages: Stage[] = pipeline?.stages?.slice().sort((a: Stage, b: Stage) => a.order - b.order) ?? [];
 
   function handleDragStart(event: DragStartEvent) {
     setActiveId(String(event.active.id));
@@ -45,7 +45,7 @@ export function KanbanPage() {
     setActiveId(null);
     if (!over || active.id === over.id) return;
 
-    const targetStageId = stages.find((s: any) => s.id === over.id)
+    const targetStageId = stages.find((s: Stage) => s.id === over.id)
       ? String(over.id)
       : leads.find((l: Lead) => l.id === over.id)?.stageId;
 
@@ -83,7 +83,7 @@ export function KanbanPage() {
         onDragEnd={handleDragEnd}
       >
         <div className="flex gap-4 overflow-x-auto pb-4 flex-1 items-start">
-          {stages.map((stage: any) => (
+          {stages.map((stage: Stage) => (
             <KanbanColumn
               key={stage.id}
               stage={stage}
