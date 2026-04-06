@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,94 +7,224 @@
 /* ── Variáveis de tema ───────────────────────────────── */
 html.dark,
 html:not(.light) {
-  --bg-main:     #141414;
-  --bg-surface:  #1f1f1f;
-  --bg-surface2: #2d2d2d;
-  --bg-sidebar:  #0a0a0a;
-  --bg-header:   #0a0a0a;
-  --bd:          #3a3a3a;
-  --tx-1:        #ffffff;
-  --tx-2:        #e0e0e0;
-  --tx-3:        #b0b0b0;
-  --tx-4:        #666666;
-  --in-bg:       #2d2d2d;
-  --in-bd:       #444444;
-  --in-ph:       #737373;
-  --nav-hover-bg:#1f1f1f;
-  --nav-hover-tx:#ffffff;
-  --logo-filter: none;
+  --bg-main:      #111111;
+  --bg-surface:   #1a1a1a;
+  --bg-surface2:  #252525;
+  --bg-sidebar:   #0d0d0d;
+  --bg-header:    #0d0d0d;
+  --bd:           #2e2e2e;
+  --bd-subtle:    #232323;
+  --tx-1:         #f0f0f0;
+  --tx-2:         #d0d0d0;
+  --tx-3:         #a0a0a0;
+  --tx-4:         #707070;   /* era #666666 — agora legível */
+  --in-bg:        #1e1e1e;
+  --in-bd:        #363636;
+  --in-ph:        #606060;
+  --nav-hover-bg: #1f1f1f;
+  --nav-hover-tx: #f0f0f0;
+  --logo-filter:  none;
+  --shadow-card:  0 1px 3px rgba(0,0,0,0.5), 0 1px 8px rgba(0,0,0,0.3);
+  --shadow-sm:    0 1px 2px rgba(0,0,0,0.4);
+  --shadow-lg:    0 4px 24px rgba(0,0,0,0.5);
+  --glow-brand:   0 0 0 1px rgba(61,161,62,0.25), 0 4px 16px rgba(61,161,62,0.1);
 }
 
 html.light {
-  --bg-main:     #f5f6fa;
-  --bg-surface:  #ffffff;
-  --bg-surface2: #eef0f5;
-  --bg-sidebar:  #ffffff;
-  --bg-header:   #ffffff;
-  --bd:          #e2e8f0;
-  --tx-1:        #111827;
-  --tx-2:        #374151;
-  --tx-3:        #6b7280;
-  --tx-4:        #9ca3af;
-  --in-bg:       #ffffff;
-  --in-bd:       #d1d5db;
-  --in-ph:       #9ca3af;
-  --nav-hover-bg:#f0f2f7;
-  --nav-hover-tx:#111827;
-  --logo-filter: drop-shadow(0 2px 8px rgba(61,161,62,0.35));
+  --bg-main:      #f2f4f8;
+  --bg-surface:   #ffffff;
+  --bg-surface2:  #eef1f6;
+  --bg-sidebar:   #ffffff;
+  --bg-header:    #ffffff;
+  --bd:           #dde2ec;
+  --bd-subtle:    #eef1f6;
+  --tx-1:         #0f1117;
+  --tx-2:         #2d3748;
+  --tx-3:         #5a6478;
+  --tx-4:         #8896a8;
+  --in-bg:        #ffffff;
+  --in-bd:        #cdd4e0;
+  --in-ph:        #94a3b8;
+  --nav-hover-bg: #eef1f6;
+  --nav-hover-tx: #0f1117;
+  --logo-filter:  drop-shadow(0 2px 8px rgba(61,161,62,0.35));
+  --shadow-card:  0 1px 3px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-sm:    0 1px 2px rgba(0,0,0,0.06);
+  --shadow-lg:    0 4px 24px rgba(0,0,0,0.10);
+  --glow-brand:   0 0 0 1px rgba(61,161,62,0.2), 0 4px 16px rgba(61,161,62,0.08);
 }
 
 /* ── Base ────────────────────────────────────────────── */
 @layer base {
   * { box-sizing: border-box; }
+
+  html { font-size: 15px; }
+
   body {
     background-color: var(--bg-main);
     color: var(--tx-1);
-    font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+    font-family: 'Outfit', ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     margin: 0;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+
+  /* Scrollbar refinada */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: var(--bd);
+    border-radius: 99px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--tx-4);
+  }
+
+  /* Seleção de texto */
+  ::selection {
+    background: rgba(61, 161, 62, 0.25);
+    color: var(--tx-1);
   }
 }
 
 /* ── Componentes ─────────────────────────────────────── */
 @layer components {
+
+  /* ─ Botões ─ */
   .btn {
-    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm
+           transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed
+           select-none;
+    letter-spacing: 0.01em;
   }
+
   .btn-primary {
-    @apply btn bg-brand-500 hover:bg-brand-400 text-dark-900;
+    @apply btn bg-brand-500 text-dark-900 font-semibold;
+    box-shadow: 0 1px 3px rgba(61,161,62,0.4), 0 0 0 0 rgba(61,161,62,0);
+    transition: background-color 0.15s, box-shadow 0.15s, transform 0.1s;
   }
+  .btn-primary:hover:not(:disabled) {
+    background-color: #46b847;
+    box-shadow: 0 2px 8px rgba(61,161,62,0.5), 0 0 0 0 rgba(61,161,62,0);
+    transform: translateY(-1px);
+  }
+  .btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(61,161,62,0.3);
+  }
+
   .btn-secondary {
     @apply btn;
     background-color: var(--bg-surface2);
     color: var(--tx-2);
+    border: 1px solid var(--bd);
   }
-  .btn-secondary:hover {
+  .btn-secondary:hover:not(:disabled) {
     background-color: var(--bd);
+    color: var(--tx-1);
   }
+
   .btn-ghost {
     @apply btn;
-    color: var(--tx-2);
+    color: var(--tx-3);
+    background: transparent;
   }
-  .btn-ghost:hover {
+  .btn-ghost:hover:not(:disabled) {
     background-color: var(--bg-surface2);
+    color: var(--tx-1);
   }
+
+  /* ─ Card ─ */
   .card {
     @apply rounded-xl border;
     background-color: var(--bg-surface);
     border-color: var(--bd);
+    box-shadow: var(--shadow-card);
   }
+
+  /* ─ Input ─ */
   .input {
-    @apply w-full rounded-lg px-3 py-2 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent;
+    @apply w-full rounded-lg px-3 py-2 text-sm transition-all duration-150
+           focus:outline-none;
     background-color: var(--in-bg);
     border: 1px solid var(--in-bd);
     color: var(--tx-1);
+    box-shadow: var(--shadow-sm);
+  }
+  .input:focus {
+    border-color: #3DA13E;
+    box-shadow: 0 0 0 3px rgba(61,161,62,0.15), var(--shadow-sm);
   }
   .input::placeholder {
     color: var(--in-ph);
   }
+
+  /* ─ Label ─ */
   .label {
-    @apply block text-sm font-medium mb-1;
-    color: var(--tx-3);
+    @apply block text-sm font-medium mb-1.5;
+    color: var(--tx-2);   /* era --tx-3 — mais legível */
+    letter-spacing: 0.01em;
   }
+
+  /* ─ Utilitário de seção heading ─ */
+  .section-title {
+    @apply text-xs font-semibold uppercase tracking-widest;
+    color: var(--tx-4);
+  }
+
+  /* ─ Linha divisória ─ */
+  .divider {
+    border-color: var(--bd);
+  }
+}
+
+/* ── Overrides de componentes específicos ────────────── */
+
+/* Sidebar: active link com glow sutil */
+.sidebar-active {
+  box-shadow: var(--glow-brand);
+}
+
+/* Badge de status na sidebar */
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Toast personalizado */
+.react-hot-toast > div {
+  font-family: 'Outfit', sans-serif !important;
+  font-size: 14px !important;
+}
+
+/* Recharts tooltip global */
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  font-family: 'Outfit', sans-serif !important;
+  font-size: 13px !important;
+  border-radius: 8px !important;
+}
+
+/* Tabelas: cabeçalho mais legível */
+thead th {
+  letter-spacing: 0.05em;
+}
+
+/* Select/option styling */
+select.input option {
+  background-color: var(--bg-surface);
+  color: var(--tx-1);
+}
+
+/* Garante que números fiquem com tabular figures */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }

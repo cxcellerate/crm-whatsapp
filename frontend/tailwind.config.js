@@ -27,12 +27,12 @@ export default {
           600: '#e06810',
         },
         dark: {
-          50: '#f0f0f0',
-          100: '#d4d4d4',
-          200: '#a3a3a3',
-          300: '#737373',
-          400: '#525252',
-          500: '#404040',
+          50:  '#f4f4f4',
+          100: '#dedede',
+          200: '#b8b8b8',
+          300: '#969696',  /* era #737373 — mais legível como texto */
+          400: '#787878',  /* era #525252 — passa WCAG AA em fundos escuros */
+          500: '#5c5c5c',  /* era #404040 — visível como texto decorativo */
           600: '#2d2d2d',
           700: '#1f1f1f',
           800: '#141414',
