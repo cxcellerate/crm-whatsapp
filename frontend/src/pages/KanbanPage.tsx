@@ -67,8 +67,8 @@ export function KanbanPage() {
     <div className="h-full flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-dark-50">Pipeline Kanban</h1>
-          {pipeline && <p className="text-dark-500 text-sm mt-0.5">{pipeline.name}</p>}
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--tx-1)' }}>Pipeline Kanban</h1>
+          {pipeline && <p className="text-sm mt-0.5" style={{ color: 'var(--tx-4)' }}>{pipeline.name}</p>}
         </div>
         <button className="btn-primary" onClick={() => { setDefaultStageId(stages[0]?.id); setModalOpen(true); }}>
           <Plus size={16} /> Novo Lead
@@ -92,8 +92,8 @@ export function KanbanPage() {
             />
           ))}
           {stages.length === 0 && (
-            <div className="flex-1 flex items-center justify-center text-dark-500 text-sm">
-              Nenhum pipeline configurado. Vá em <strong className="mx-1 text-dark-300">Configurações</strong> para criar etapas.
+            <div className="flex-1 flex items-center justify-center text-sm" style={{ color: 'var(--tx-4)' }}>
+              Nenhum pipeline configurado. Vá em <strong className="mx-1" style={{ color: 'var(--tx-2)' }}>Configurações</strong> para criar etapas.
             </div>
           )}
         </div>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { UserPlus, Pencil, ToggleLeft, ToggleRight, Shield, Users } from 'lucide-react';
+import { UserPlus, ToggleLeft, ToggleRight, Shield, Users } from 'lucide-react';
 import { api } from '../services/api';
 import { Modal } from '../components/ui/Modal';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -45,53 +45,80 @@ export function UsersPage() {
     defaultValues: { role: 'SELLER' },
   });
 
-  const ROLE_COLORS: Record<string, string> = {
-    ADMIN: 'bg-brand-500/20 text-brand-400',
-    MANAGER: 'bg-blue-500/20 text-blue-400',
-    SELLER: 'bg-dark-600 text-dark-300',
-  };
   const ROLE_LABELS: Record<string, string> = {
     ADMIN: 'Administrador', MANAGER: 'Gerente', SELLER: 'Vendedor',
   };
 
+  function roleStyle(role: string) {
+    if (role === 'ADMIN') return { backgroundColor: '#3DA13E20', color: '#3DA13E' };
+    if (role === 'MANAGER') return { backgroundColor: 'rgba(59,130,246,0.12)', color: '#60a5fa' };
+    return { backgroundColor: 'var(--bg-surface2)', color: 'var(--tx-3)' };
+  }
+
   return (
     <div className="space-y-5 max-w-3xl">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-dark-50">Equipe</h1>
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--tx-1)' }}>Equipe</h1>
         <button className="btn-primary" onClick={() => setInviteOpen(true)}>
           <UserPlus size={16} /> Novo Usuário
         </button>
       </div>
 
       {users.length === 0 ? (
-        <EmptyState icon={Users} title="Nenhum usuário" description="Convide membros para sua equipe" action={<button className="btn-primary" onClick={() => setInviteOpen(true)}><UserPlus size={16} /> Novo Usuário</button>} />
+        <EmptyState
+          icon={Users}
+          title="Nenhum usuário"
+          description="Convide membros para sua equipe"
+          action={<button className="btn-primary" onClick={() => setInviteOpen(true)}><UserPlus size={16} /> Novo Usuário</button>}
+        />
       ) : (
         <div className="space-y-2">
           {users.map((user: User) => (
-            <div key={user.id} className={`card p-4 flex items-center gap-4 transition-opacity ${!user.active ? 'opacity-60' : ''}`}>
+            <div
+              key={user.id}
+              className={`card p-4 flex items-center gap-4 transition-opacity ${!user.active ? 'opacity-60' : ''}`}
+            >
               {/* Avatar */}
-              <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-lg font-bold shrink-0 ${user.active ? 'bg-brand-500/20 text-brand-400' : 'bg-dark-700 text-dark-500'}`}>
+              <div
+                className="w-11 h-11 rounded-xl flex items-center justify-center text-lg font-bold shrink-0"
+                style={
+                  user.active
+                    ? { backgroundColor: '#3DA13E20', color: '#3DA13E' }
+                    : { backgroundColor: 'var(--bg-surface2)', color: 'var(--tx-4)' }
+                }
+              >
                 {user.name[0].toUpperCase()}
               </div>
 
               {/* Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <p className="font-medium text-dark-100">{user.name}</p>
-                  {user.role === 'ADMIN' && <Shield size={13} className="text-brand-400" />}
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${ROLE_COLORS[user.role]}`}>
+                  <p className="font-medium" style={{ color: 'var(--tx-1)' }}>{user.name}</p>
+                  {user.role === 'ADMIN' && <Shield size={13} className="text-brand-500" />}
+                  <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={roleStyle(user.role)}>
                     {ROLE_LABELS[user.role]}
                   </span>
-                  {!user.active && <span className="text-xs px-2 py-0.5 rounded-full bg-red-500/10 text-red-400">Inativo</span>}
+                  {!user.active && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-red-500/10 text-red-400">Inativo</span>
+                  )}
                 </div>
-                <p className="text-dark-500 text-sm mt-0.5 truncate">{user.email}</p>
+                <p className="text-sm mt-0.5 truncate" style={{ color: 'var(--tx-4)' }}>{user.email}</p>
               </div>
 
               {/* Actions */}
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   onClick={() => toggleActive.mutate({ id: user.id, active: !user.active })}
-                  className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-colors ${user.active ? 'hover:bg-red-500/10 text-dark-400 hover:text-red-400' : 'hover:bg-green-500/10 text-dark-500 hover:text-green-400'}`}
+                  className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-colors"
+                  style={{ color: 'var(--tx-3)' }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.backgroundColor = user.active ? 'rgba(239,68,68,0.08)' : 'rgba(34,197,94,0.08)';
+                    e.currentTarget.style.color = user.active ? '#f87171' : '#4ade80';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = 'var(--tx-3)';
+                  }}
                   title={user.active ? 'Desativar' : 'Ativar'}
                 >
                   {user.active ? <ToggleRight size={16} /> : <ToggleLeft size={16} />}
@@ -106,16 +133,18 @@ export function UsersPage() {
       {/* Stats */}
       {users.length > 0 && (
         <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: 'Total', value: users.length, color: 'text-dark-200' },
-            { label: 'Ativos', value: users.filter((u: User) => u.active).length, color: 'text-green-400' },
-            { label: 'Inativos', value: users.filter((u: User) => !u.active).length, color: 'text-red-400' },
-          ].map(({ label, value, color }) => (
-            <div key={label} className="card p-4 text-center">
-              <p className={`text-2xl font-bold ${color}`}>{value}</p>
-              <p className="text-dark-500 text-sm">{label}</p>
-            </div>
-          ))}
+          <div className="card p-4 text-center">
+            <p className="text-2xl font-bold" style={{ color: 'var(--tx-1)' }}>{users.length}</p>
+            <p className="text-sm" style={{ color: 'var(--tx-4)' }}>Total</p>
+          </div>
+          <div className="card p-4 text-center">
+            <p className="text-2xl font-bold text-green-500">{users.filter((u: User) => u.active).length}</p>
+            <p className="text-sm" style={{ color: 'var(--tx-4)' }}>Ativos</p>
+          </div>
+          <div className="card p-4 text-center">
+            <p className="text-2xl font-bold text-red-400">{users.filter((u: User) => !u.active).length}</p>
+            <p className="text-sm" style={{ color: 'var(--tx-4)' }}>Inativos</p>
+          </div>
         </div>
       )}
 

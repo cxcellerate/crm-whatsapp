@@ -24,10 +24,28 @@ export function Modal({ open, onClose, title, children, size = 'md' }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div role="dialog" aria-modal="true" aria-labelledby="modal-title" className={`relative w-full ${sizes[size]} bg-dark-800 rounded-2xl border border-dark-600 shadow-2xl`}>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-dark-700">
-          <h2 id="modal-title" className="font-semibold text-dark-100">{title}</h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-dark-700 text-dark-400 hover:text-dark-100 transition-colors">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+        className={`relative w-full ${sizes[size]} rounded-2xl shadow-2xl`}
+        style={{
+          backgroundColor: 'var(--bg-surface)',
+          border: '1px solid var(--bd)',
+        }}
+      >
+        <div
+          className="flex items-center justify-between px-6 py-4 border-b"
+          style={{ borderColor: 'var(--bd)' }}
+        >
+          <h2 id="modal-title" className="font-semibold" style={{ color: 'var(--tx-1)' }}>{title}</h2>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg transition-colors"
+            style={{ color: 'var(--tx-3)' }}
+            onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--bg-surface2)'; e.currentTarget.style.color = 'var(--tx-1)'; }}
+            onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--tx-3)'; }}
+          >
             <X size={16} />
           </button>
         </div>
