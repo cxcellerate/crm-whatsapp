@@ -5,6 +5,24 @@ import { isAgentEnabled } from '../services/ai-agent.service';
 import { publishAgentJob, isMessageDuplicate } from '../services/upstash.service';
 import { logger } from '../utils/logger';
 
+// ─── Verificação de token dos webhooks ───────────────────────────────────────
+// Se a variável de ambiente estiver definida, exige que o header bata exato.
+// Se não estiver definida, permite (com aviso) para não quebrar setup existente.
+
+function verifyWebhookToken(headerValue: string | string[] | undefined, envKey: string): boolean {
+  const expected = process.env[envKey]?.trim();
+  if (!expected) {
+    logger.warn(`[Webhook] ${envKey} não definido — acesso liberado sem verificação`);
+    return true;
+  }
+  const received = Array.isArray(headerValue) ? headerValue[0] : headerValue;
+  if (received !== expected) {
+    logger.error(`[Webhook] Token inválido para ${envKey}`);
+    return false;
+  }
+  return true;
+}
+
 async function processInboundMessage(phone: string, content: string, waMessageId?: string) {
   if (!phone || !content) return;
 
@@ -55,6 +73,10 @@ async function processInboundMessage(phone: string, content: string, waMessageId
 
 // ─── Evolution API ─────────────────────────────────────────────────────────────
 export async function receiveWhatsApp(req: Request, res: Response) {
+  if (!verifyWebhookToken(req.headers['apikey'], 'EVOLUTION_WEBHOOK_TOKEN')) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
   const { data, event } = req.body;
   if (event !== 'messages.upsert') return res.sendStatus(200);
 
@@ -78,6 +100,10 @@ export async function receiveWhatsApp(req: Request, res: Response) {
 
 // ─── Z-API ─────────────────────────────────────────────────────────────────────
 export async function receiveZapi(req: Request, res: Response) {
+  if (!verifyWebhookToken(req.headers['client-token'], 'ZAPI_WEBHOOK_TOKEN')) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
   const body = req.body;
   if (body.fromMe === true) return res.sendStatus(200);
 

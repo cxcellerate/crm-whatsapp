@@ -399,6 +399,14 @@ export async function processAgentMessage(phone: string, userMessage: string, le
     }
   }
 
+  // Se esgotou MAX_TOOL_ITERATIONS sem chamar finish_conversation, força encerramento.
+  // Isso evita que a sessão fique ACTIVE para sempre quando o modelo falha em chamar a tool.
+  if (!sessionCompleted && toolIterations >= MAX_TOOL_ITERATIONS) {
+    logger.warn(`[AI Agent SDK] MAX_TOOL_ITERATIONS atingido sem finish_conversation para ${phone} — forçando encerramento`);
+    await handleFinishConversation(ctx, { reason: 'max_turns', summary: 'Limite de iterações atingido automaticamente.' }).catch(() => null);
+    sessionCompleted = true;
+  }
+
   // Atualiza turn count e status final
   const newTurnCount = session.turnCount + 1;
   const shouldComplete = sessionCompleted || newTurnCount >= config.maxTurns;

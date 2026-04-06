@@ -18,6 +18,15 @@ import { aiAgentRoutes } from './routes/ai-agent.routes';
 import { agentWorkerRoutes } from './routes/agent-worker.routes';
 import { errorHandler } from './middleware/error.middleware';
 
+// ─── Validação de variáveis de ambiente obrigatórias ─────────────────────────
+if (process.env.NODE_ENV === 'production') {
+  const required = ['JWT_SECRET', 'DATABASE_URL'];
+  const missing = required.filter((k) => !process.env[k]);
+  if (missing.length > 0) {
+    throw new Error(`[Startup] Variáveis obrigatórias não definidas em produção: ${missing.join(', ')}`);
+  }
+}
+
 const app = express();
 
 const allowedOrigins = [
@@ -33,11 +42,15 @@ app.use(
       const allowed = allowedOrigins.some((o) =>
         typeof o === 'string' ? o === origin : o.test(origin)
       );
-      cb(null, allowed);
+      cb(null, allowed ? origin : false);
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Authorization', 'Content-Type'],
   })
 );
+// Responde preflight OPTIONS para todas as rotas /api/*
+app.options('/api/*', cors());
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'tiny' : 'dev'));
 app.use(express.json({
   limit: '10mb',
@@ -59,9 +72,8 @@ app.use('/api/ai-agent', aiAgentRoutes);
 app.use('/api/agent-worker', agentWorkerRoutes);
 
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', env: process.env.NODE_ENV, timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
-
 
 app.use(errorHandler);
 

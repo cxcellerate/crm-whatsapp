@@ -76,14 +76,23 @@ export async function createLead(req: AuthRequest, res: Response) {
   res.status(201).json(lead);
 }
 
+const LEAD_UPDATE_ALLOWED_FIELDS = [
+  'name', 'phone', 'email', 'company', 'value',
+  'notes', 'tags', 'assignedTo', 'source',
+] as const;
+
 export async function updateLead(req: AuthRequest, res: Response) {
   const { id } = req.params;
   const exists = await prisma.lead.findUnique({ where: { id } });
   if (!exists) throw new AppError('Lead não encontrado', 404);
 
+  const safeData = Object.fromEntries(
+    Object.entries(req.body).filter(([k]) => (LEAD_UPDATE_ALLOWED_FIELDS as readonly string[]).includes(k))
+  );
+
   const lead = await prisma.lead.update({
     where: { id },
-    data: req.body,
+    data: safeData,
     include: {
       stage: { include: { pipeline: true } },
       user: { select: { id: true, name: true, avatar: true } },
