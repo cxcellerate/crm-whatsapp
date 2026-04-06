@@ -11,11 +11,24 @@ export function useSocket() {
   const token = useAuthStore((s) => s.token);
   const queryClient = useQueryClient();
   const addNotification = useNotificationsStore((s) => s.add);
-  const initialized = useRef(false);
+
+  // Refs para usar dentro dos listeners sem colocá-los como dependência do useEffect
+  const queryClientRef = useRef(queryClient);
+  const addNotificationRef = useRef(addNotification);
+  queryClientRef.current = queryClient;
+  addNotificationRef.current = addNotification;
 
   useEffect(() => {
-    if (!token || initialized.current) return;
-    initialized.current = true;
+    if (!token) {
+      // Logout explícito: desconecta se ainda estava conectado
+      if (socket) {
+        socket.disconnect();
+        socket = null;
+      }
+      return;
+    }
+
+    if (socket) return; // Já conectado com este token
 
     socket = io(import.meta.env.VITE_WS_URL || '', {
       auth: { token },
@@ -25,9 +38,9 @@ export function useSocket() {
     socket.on('connect', () => console.log('[Socket] conectado'));
 
     socket.on('lead:created', (lead: any) => {
-      queryClient.invalidateQueries({ queryKey: ['leads'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
-      addNotification({
+      queryClientRef.current.invalidateQueries({ queryKey: ['leads'] });
+      queryClientRef.current.invalidateQueries({ queryKey: ['dashboard-stats'] });
+      addNotificationRef.current({
         type: 'lead',
         title: 'Novo lead capturado',
         body: `${lead.name} — ${lead.phone}`,
@@ -37,22 +50,22 @@ export function useSocket() {
     });
 
     socket.on('lead:updated', () => {
-      queryClient.invalidateQueries({ queryKey: ['leads'] });
+      queryClientRef.current.invalidateQueries({ queryKey: ['leads'] });
     });
 
     socket.on('lead:moved', () => {
-      queryClient.invalidateQueries({ queryKey: ['leads'] });
+      queryClientRef.current.invalidateQueries({ queryKey: ['leads'] });
     });
 
     socket.on('lead:deleted', () => {
-      queryClient.invalidateQueries({ queryKey: ['leads'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
+      queryClientRef.current.invalidateQueries({ queryKey: ['leads'] });
+      queryClientRef.current.invalidateQueries({ queryKey: ['dashboard-stats'] });
     });
 
     socket.on('whatsapp:message', (data: { lead: any; message: any }) => {
-      queryClient.invalidateQueries({ queryKey: ['leads'] });
-      queryClient.invalidateQueries({ queryKey: ['messages', data.lead.id] });
-      addNotification({
+      queryClientRef.current.invalidateQueries({ queryKey: ['leads'] });
+      queryClientRef.current.invalidateQueries({ queryKey: ['messages', data.lead.id] });
+      addNotificationRef.current({
         type: 'message',
         title: `Mensagem de ${data.lead.name}`,
         body: data.message.content?.substring(0, 80) || 'Nova mensagem recebida',
@@ -64,9 +77,8 @@ export function useSocket() {
     return () => {
       socket?.disconnect();
       socket = null;
-      initialized.current = false;
     };
-  }, [token, queryClient, addNotification]);
+  }, [token]); // Apenas token como dependência — reconecta somente ao fazer login/logout
 
   return socket;
 }
