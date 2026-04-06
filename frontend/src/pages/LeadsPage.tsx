@@ -47,14 +47,14 @@ export function LeadsPage() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-dark-50">Leads</h1>
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--tx-1)' }}>Leads</h1>
         <button className="btn-primary" onClick={() => setModalOpen(true)}>
           <Plus size={16} /> Novo Lead
         </button>
       </div>
 
       <div className="relative">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-dark-400" />
+        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--tx-4)' }} />
         <input
           className="input pl-9"
           placeholder="Buscar por nome, telefone ou email..."
@@ -75,23 +75,35 @@ export function LeadsPage() {
       ) : (
         <div className="card overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="border-b border-dark-600">
+            <thead className="border-b" style={{ borderColor: 'var(--bd)' }}>
               <tr>
                 {['Lead', 'Contato', 'Etapa', 'Origem', 'Valor', 'Criado em', ''].map((h) => (
-                  <th key={h} className="text-left px-4 py-3 text-dark-400 font-medium text-xs uppercase tracking-wide">{h}</th>
+                  <th
+                    key={h}
+                    className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wide"
+                    style={{ color: 'var(--tx-3)' }}
+                  >
+                    {h}
+                  </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-dark-700">
+            <tbody>
               {leads.map((lead: Lead) => (
-                <tr key={lead.id} className="hover:bg-dark-700/40 transition-colors">
+                <tr
+                  key={lead.id}
+                  className="border-b transition-colors"
+                  style={{ borderColor: 'var(--bd)' }}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--bg-surface2)')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+                >
                   <td className="px-4 py-3">
-                    <p className="font-medium text-dark-100">{lead.name}</p>
-                    {lead.company && <p className="text-dark-500 text-xs mt-0.5">{lead.company}</p>}
+                    <p className="font-semibold text-sm" style={{ color: 'var(--tx-1)' }}>{lead.name}</p>
+                    {lead.company && <p className="text-xs mt-0.5" style={{ color: 'var(--tx-4)' }}>{lead.company}</p>}
                   </td>
                   <td className="px-4 py-3">
-                    <p className="text-dark-300 text-xs">{lead.phone}</p>
-                    {lead.email && <p className="text-dark-500 text-xs mt-0.5">{lead.email}</p>}
+                    <p className="text-xs" style={{ color: 'var(--tx-2)' }}>{lead.phone}</p>
+                    {lead.email && <p className="text-xs mt-0.5" style={{ color: 'var(--tx-4)' }}>{lead.email}</p>}
                   </td>
                   <td className="px-4 py-3">
                     <Badge color={lead.stage?.color}>{lead.stage?.name}</Badge>
@@ -99,20 +111,32 @@ export function LeadsPage() {
                   <td className="px-4 py-3">
                     <Badge color={SOURCE_COLORS[lead.source]}>{SOURCE_LABELS[lead.source]}</Badge>
                   </td>
-                  <td className="px-4 py-3 text-dark-200 text-xs">
+                  <td className="px-4 py-3 text-xs" style={{ color: 'var(--tx-2)' }}>
                     {lead.value
                       ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lead.value)
                       : '—'}
                   </td>
-                  <td className="px-4 py-3 text-dark-500 text-xs">
+                  <td className="px-4 py-3 text-xs" style={{ color: 'var(--tx-4)' }}>
                     {format(new Date(lead.createdAt), "dd/MM/yy", { locale: ptBR })}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
-                      <button onClick={() => handleEdit(lead)} className="p-1.5 hover:bg-dark-600 rounded-lg text-dark-400 hover:text-dark-100 transition-colors">
+                      <button
+                        onClick={() => handleEdit(lead)}
+                        className="p-1.5 rounded-lg transition-colors"
+                        style={{ color: 'var(--tx-3)' }}
+                        onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--bg-surface2)'; e.currentTarget.style.color = 'var(--tx-1)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--tx-3)'; }}
+                      >
                         <Pencil size={13} />
                       </button>
-                      <button onClick={() => setDeletingId(lead.id)} className="p-1.5 hover:bg-red-500/10 rounded-lg text-dark-400 hover:text-red-400 transition-colors">
+                      <button
+                        onClick={() => setDeletingId(lead.id)}
+                        className="p-1.5 rounded-lg transition-colors"
+                        style={{ color: 'var(--tx-3)' }}
+                        onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.08)'; e.currentTarget.style.color = '#f87171'; }}
+                        onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--tx-3)'; }}
+                      >
                         <Trash2 size={13} />
                       </button>
                     </div>
@@ -121,7 +145,7 @@ export function LeadsPage() {
               ))}
             </tbody>
           </table>
-          <div className="px-4 py-2 border-t border-dark-700 text-xs text-dark-500">
+          <div className="px-4 py-2 border-t text-xs" style={{ borderColor: 'var(--bd)', color: 'var(--tx-4)' }}>
             {leads.length} lead{leads.length !== 1 ? 's' : ''}
           </div>
         </div>

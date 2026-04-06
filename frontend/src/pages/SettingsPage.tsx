@@ -41,13 +41,13 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <h1 className="text-2xl font-bold text-dark-50">Configurações</h1>
+      <h1 className="text-2xl font-bold" style={{ color: 'var(--tx-1)' }}>Configurações</h1>
 
       {/* WhatsApp — com seletor de provedor */}
       <div className="card p-6">
         <div className="flex items-center gap-3 mb-5">
           <Wifi size={18} className="text-brand-400" />
-          <h2 className="font-semibold text-dark-100">WhatsApp Business</h2>
+          <h2 className="font-semibold" style={{ color: 'var(--tx-1)' }}>WhatsApp Business</h2>
         </div>
         <WhatsAppProviderConfig />
       </div>
@@ -56,7 +56,7 @@ export function SettingsPage() {
       <div className="card p-6 space-y-4">
         <div className="flex items-center gap-3">
           <GitBranch size={18} className="text-brand-400" />
-          <h2 className="font-semibold text-dark-100">Pipelines e Etapas</h2>
+          <h2 className="font-semibold" style={{ color: 'var(--tx-1)' }}>Pipelines e Etapas</h2>
         </div>
 
         <form onSubmit={handleCreatePipeline} className="flex gap-2">
@@ -68,9 +68,13 @@ export function SettingsPage() {
 
         <div className="space-y-4">
           {pipelines.map((pipeline: any) => (
-            <div key={pipeline.id} className="bg-dark-800 rounded-xl p-4 space-y-3">
+            <div
+              key={pipeline.id}
+              className="rounded-xl p-4 space-y-3"
+              style={{ backgroundColor: 'var(--bg-surface2)', border: '1px solid var(--bd)' }}
+            >
               <div className="flex items-center justify-between">
-                <p className="font-medium text-dark-100">{pipeline.name}</p>
+                <p className="font-medium" style={{ color: 'var(--tx-1)' }}>{pipeline.name}</p>
                 <button
                   className="btn-secondary text-xs px-3 py-1.5"
                   onClick={() => { setSelectedPipelineId(pipeline.id); setStageModalOpen(true); }}
@@ -80,12 +84,19 @@ export function SettingsPage() {
               </div>
               <div className="space-y-1.5">
                 {pipeline.stages?.slice().sort((a: any, b: any) => a.order - b.order).map((stage: any) => (
-                  <div key={stage.id} className="flex items-center gap-2 px-3 py-2 bg-dark-700 rounded-lg">
+                  <div
+                    key={stage.id}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg"
+                    style={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--bd)' }}
+                  >
                     <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: stage.color }} />
-                    <span className="text-sm text-dark-200 flex-1">{stage.name}</span>
-                    <span className="text-xs text-dark-500">{stage._count?.leads || 0} leads</span>
+                    <span className="text-sm flex-1" style={{ color: 'var(--tx-1)' }}>{stage.name}</span>
+                    <span className="text-xs" style={{ color: 'var(--tx-4)' }}>{stage._count?.leads || 0} leads</span>
                     <button
-                      className="p-1 hover:bg-red-500/10 rounded text-dark-600 hover:text-red-400 transition-colors"
+                      className="p-1 rounded transition-colors"
+                      style={{ color: 'var(--tx-4)' }}
+                      onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.08)'; e.currentTarget.style.color = '#f87171'; }}
+                      onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--tx-4)'; }}
                       onClick={() => setDeletingStage({ pipelineId: pipeline.id, stageId: stage.id })}
                     >
                       <Trash2 size={12} />
@@ -93,13 +104,13 @@ export function SettingsPage() {
                   </div>
                 ))}
                 {pipeline.stages?.length === 0 && (
-                  <p className="text-dark-600 text-xs px-3">Nenhuma etapa. Adicione a primeira.</p>
+                  <p className="text-xs px-3" style={{ color: 'var(--tx-4)' }}>Nenhuma etapa. Adicione a primeira.</p>
                 )}
               </div>
             </div>
           ))}
           {pipelines.length === 0 && (
-            <p className="text-dark-500 text-sm text-center py-4">Crie seu primeiro pipeline acima.</p>
+            <p className="text-sm text-center py-4" style={{ color: 'var(--tx-4)' }}>Crie seu primeiro pipeline acima.</p>
           )}
         </div>
       </div>
@@ -108,23 +119,37 @@ export function SettingsPage() {
       <div className="card p-6 space-y-4">
         <div className="flex items-center gap-3">
           <Users size={18} className="text-brand-400" />
-          <h2 className="font-semibold text-dark-100">Equipe</h2>
+          <h2 className="font-semibold" style={{ color: 'var(--tx-1)' }}>Equipe</h2>
         </div>
         <div className="space-y-2">
           {users.map((user: any) => (
-            <div key={user.id} className="flex items-center justify-between p-3 bg-dark-700 rounded-lg">
+            <div
+              key={user.id}
+              className="flex items-center justify-between p-3 rounded-lg"
+              style={{ backgroundColor: 'var(--bg-surface2)', border: '1px solid var(--bd)' }}
+            >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-dark-600 rounded-full flex items-center justify-center text-dark-300 font-medium text-sm">
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center font-medium text-sm"
+                  style={{ backgroundColor: '#3DA13E20', color: '#3DA13E' }}
+                >
                   {user.name[0].toUpperCase()}
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-dark-100">{user.name}</p>
-                  <p className="text-xs text-dark-500">{user.email}</p>
+                  <p className="text-sm font-medium" style={{ color: 'var(--tx-1)' }}>{user.name}</p>
+                  <p className="text-xs" style={{ color: 'var(--tx-4)' }}>{user.email}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {user.active ? <CheckCircle size={14} className="text-green-400" /> : <XCircle size={14} className="text-red-400" />}
-                <span className={`text-xs px-2 py-0.5 rounded-full ${user.role === 'ADMIN' ? 'bg-brand-500/20 text-brand-400' : 'bg-dark-600 text-dark-300'}`}>
+                {user.active ? <CheckCircle size={14} className="text-green-500" /> : <XCircle size={14} className="text-red-400" />}
+                <span
+                  className="text-xs px-2 py-0.5 rounded-full"
+                  style={
+                    user.role === 'ADMIN'
+                      ? { backgroundColor: '#3DA13E20', color: '#3DA13E' }
+                      : { backgroundColor: 'var(--bd)', color: 'var(--tx-3)' }
+                  }
+                >
                   {user.role}
                 </span>
               </div>
@@ -145,8 +170,9 @@ export function SettingsPage() {
             <div className="flex gap-2 flex-wrap mt-1">
               {COLORS.map((c) => (
                 <button key={c} type="button"
-                  className={`w-7 h-7 rounded-full border-2 transition-transform hover:scale-110 ${newStageColor === c ? 'border-white scale-110' : 'border-transparent'}`}
-                  style={{ backgroundColor: c }} onClick={() => setNewStageColor(c)} />
+                  className={`w-7 h-7 rounded-full border-2 transition-transform hover:scale-110 ${newStageColor === c ? 'scale-110' : 'border-transparent'}`}
+                  style={{ backgroundColor: c, borderColor: newStageColor === c ? 'var(--tx-1)' : 'transparent' }}
+                  onClick={() => setNewStageColor(c)} />
               ))}
             </div>
           </div>

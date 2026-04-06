@@ -34,26 +34,31 @@ export function LeadCard({ lead }: Props) {
       className="block card p-3 hover:border-brand-500/40 transition-all hover:shadow-lg hover:shadow-brand-500/5 cursor-pointer group"
     >
       <div className="flex items-start justify-between gap-2 mb-2">
-        <p className="font-medium text-dark-100 text-sm group-hover:text-dark-50 leading-tight">{lead.name}</p>
+        <p className="font-medium text-sm leading-tight" style={{ color: 'var(--tx-1)' }}>
+          {lead.name}
+        </p>
         <Badge color={SOURCE_COLORS[lead.source]}>{SOURCE_LABELS[lead.source]}</Badge>
       </div>
 
       <div className="space-y-1">
-        <p className="text-dark-400 text-xs flex items-center gap-1.5">
+        <p className="text-xs flex items-center gap-1.5" style={{ color: 'var(--tx-3)' }}>
           <Phone size={10} className="shrink-0" />
           {lead.phone}
         </p>
         {lead.email && (
-          <p className="text-dark-500 text-xs flex items-center gap-1.5">
+          <p className="text-xs flex items-center gap-1.5" style={{ color: 'var(--tx-4)' }}>
             <Mail size={10} className="shrink-0" />
             {lead.email}
           </p>
         )}
       </div>
 
-      <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-dark-700">
+      <div
+        className="flex items-center justify-between mt-2.5 pt-2 border-t"
+        style={{ borderColor: 'var(--bd)' }}
+      >
         {lead.value ? (
-          <span className="text-xs text-brand-400 font-medium flex items-center gap-1">
+          <span className="text-xs font-medium flex items-center gap-1" style={{ color: '#3DA13E' }}>
             <DollarSign size={10} />
             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lead.value)}
           </span>
@@ -61,7 +66,7 @@ export function LeadCard({ lead }: Props) {
           <span />
         )}
         {lead._count && lead._count.messages > 0 && (
-          <span className="text-xs text-dark-500 flex items-center gap-1">
+          <span className="text-xs flex items-center gap-1" style={{ color: 'var(--tx-4)' }}>
             <MessageSquare size={10} />
             {lead._count.messages}
           </span>
@@ -70,10 +75,13 @@ export function LeadCard({ lead }: Props) {
 
       {lead.user && (
         <div className="flex items-center gap-1.5 mt-2">
-          <div className="w-4 h-4 bg-dark-600 rounded-full flex items-center justify-center">
-            <span className="text-[8px] text-dark-300">{lead.user.name[0]}</span>
+          <div
+            className="w-4 h-4 rounded-full flex items-center justify-center"
+            style={{ backgroundColor: 'var(--bg-surface2)' }}
+          >
+            <span className="text-[8px]" style={{ color: 'var(--tx-3)' }}>{lead.user.name[0]}</span>
           </div>
-          <span className="text-[11px] text-dark-500">{lead.user.name}</span>
+          <span className="text-[11px]" style={{ color: 'var(--tx-4)' }}>{lead.user.name}</span>
         </div>
       )}
     </Link>
