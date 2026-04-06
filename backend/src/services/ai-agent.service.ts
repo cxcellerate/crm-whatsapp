@@ -284,20 +284,18 @@ export async function processAgentMessage(phone: string, userMessage: string, le
     return;
   }
 
-  // Busca ou cria sessão
-  let session = await prisma.aiAgentSession.findUnique({ where: { phone } });
-
-  // Sessão encerrada → cria nova para reiniciar o atendimento
-  if (session?.status === 'COMPLETED' || session?.status === 'ABANDONED') {
-    await prisma.aiAgentSession.delete({ where: { id: session.id } });
-    session = null;
+  // Busca ou cria sessão — usa upsert para evitar race condition com jobs concorrentes.
+  // Sessões encerradas são deletadas para que a nova chamada gere uma sessão limpa.
+  const existing = await prisma.aiAgentSession.findUnique({ where: { phone } });
+  if (existing?.status === 'COMPLETED' || existing?.status === 'ABANDONED') {
+    await prisma.aiAgentSession.delete({ where: { id: existing.id } }).catch(() => null);
   }
 
-  if (!session) {
-    session = await prisma.aiAgentSession.create({ data: { phone, leadId } });
-  } else if (!session.leadId) {
-    session = await prisma.aiAgentSession.update({ where: { id: session.id }, data: { leadId } });
-  }
+  let session = await prisma.aiAgentSession.upsert({
+    where: { phone },
+    create: { phone, leadId },
+    update: { ...(leadId ? { leadId } : {}) },
+  });
 
   const ctx: ToolContext = { phone, leadId, sessionId: session.id };
 

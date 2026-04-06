@@ -49,11 +49,14 @@ export async function getWhatsAppConfig(): Promise<WhatsAppConfig> {
 
 // ─── Evolution API ────────────────────────────────────────────────────────────
 
+const WHATSAPP_TIMEOUT_MS = 10_000;
+
 async function sendEvolution(phone: string, message: string, config: WhatsAppConfig) {
   const instance = config.evolutionInstance || 'default';
   const api = axios.create({
     baseURL: config.evolutionUrl,
     headers: { apikey: config.evolutionKey },
+    timeout: WHATSAPP_TIMEOUT_MS,
   });
 
   const cleanPhone = phone.replace(/\D/g, '');
@@ -73,6 +76,7 @@ async function getEvolutionStatus(config: WhatsAppConfig) {
     const api = axios.create({
       baseURL: config.evolutionUrl,
       headers: { apikey: config.evolutionKey },
+      timeout: WHATSAPP_TIMEOUT_MS,
     });
     const res = await api.get(`/instance/connectionState/${instance}`);
     return { provider: 'evolution', state: res.data?.instance?.state || 'unknown' };
@@ -96,6 +100,7 @@ async function sendZapi(phone: string, message: string, config: WhatsAppConfig) 
       'Client-Token': config.zapiClientToken || '',
       'Content-Type': 'application/json',
     },
+    timeout: WHATSAPP_TIMEOUT_MS,
   });
 
   const response = await api.post('/send-text', {
@@ -114,6 +119,7 @@ async function getZapiStatus(config: WhatsAppConfig) {
     const api = axios.create({
       baseURL: `https://api.z-api.io/instances/${config.zapiInstanceId}/token/${config.zapiToken}`,
       headers: { 'Client-Token': config.zapiClientToken || '' },
+      timeout: WHATSAPP_TIMEOUT_MS,
     });
     const res = await api.get('/status');
     const connected = res.data?.connected === true || res.data?.value === 'CONNECTED';

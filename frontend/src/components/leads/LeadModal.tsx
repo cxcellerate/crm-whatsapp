@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { Modal } from '../ui/Modal';
 import { usePipelines } from '../../hooks/usePipelines';
@@ -49,6 +49,11 @@ export function LeadModal({ open, onClose, lead }: Props) {
     p.stages.map((s: any) => ({ ...s, pipelineName: p.name }))
   );
 
+  // Captura allStages no momento em que o modal abre para não colocá-lo
+  // no dep array do useEffect (evita reset do form em refetches automáticos)
+  const allStagesRef = useRef(allStages);
+  if (open) allStagesRef.current = allStages;
+
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>({
     defaultValues: {
       source: 'MANUAL',
@@ -57,6 +62,7 @@ export function LeadModal({ open, onClose, lead }: Props) {
   });
 
   useEffect(() => {
+    if (!open) return;
     if (lead) {
       reset({
         name: lead.name,
@@ -70,9 +76,9 @@ export function LeadModal({ open, onClose, lead }: Props) {
         notes: lead.notes || '',
       });
     } else {
-      reset({ source: 'MANUAL', stageId: allStages[0]?.id || '' });
+      reset({ source: 'MANUAL', stageId: allStagesRef.current[0]?.id || '' });
     }
-  }, [lead, open, allStages.length]);
+  }, [lead, open]); // allStages propositalmente fora do array — usa ref para não resetar durante edição
 
   async function onSubmit(data: FormData) {
     const payload = {

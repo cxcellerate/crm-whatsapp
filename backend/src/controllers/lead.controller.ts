@@ -6,29 +6,39 @@ import { emitEvent } from '../utils/socket';
 
 export async function getLeads(req: AuthRequest, res: Response) {
   const { stageId, assignedTo, search } = req.query;
+  const limit = Math.min(parseInt(String(req.query.limit || '100'), 10), 200);
+  const offset = Math.max(parseInt(String(req.query.offset || '0'), 10), 0);
 
-  const leads = await prisma.lead.findMany({
-    where: {
-      ...(stageId ? { stageId: String(stageId) } : {}),
-      ...(assignedTo ? { assignedTo: String(assignedTo) } : {}),
-      ...(search
-        ? {
-            OR: [
-              { name: { contains: String(search), mode: 'insensitive' } },
-              { phone: { contains: String(search) } },
-              { email: { contains: String(search), mode: 'insensitive' } },
-            ],
-          }
-        : {}),
-    },
-    include: {
-      stage: { include: { pipeline: true } },
-      user: { select: { id: true, name: true, avatar: true } },
-      _count: { select: { messages: true } },
-    },
-    orderBy: { createdAt: 'desc' },
-  });
+  const where = {
+    ...(stageId ? { stageId: String(stageId) } : {}),
+    ...(assignedTo ? { assignedTo: String(assignedTo) } : {}),
+    ...(search
+      ? {
+          OR: [
+            { name: { contains: String(search), mode: 'insensitive' as const } },
+            { phone: { contains: String(search) } },
+            { email: { contains: String(search), mode: 'insensitive' as const } },
+          ],
+        }
+      : {}),
+  };
 
+  const [leads, total] = await Promise.all([
+    prisma.lead.findMany({
+      where,
+      include: {
+        stage: { include: { pipeline: true } },
+        user: { select: { id: true, name: true, avatar: true } },
+        _count: { select: { messages: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+      skip: offset,
+    }),
+    prisma.lead.count({ where }),
+  ]);
+
+  res.set('X-Total-Count', String(total));
   res.json(leads);
 }
 

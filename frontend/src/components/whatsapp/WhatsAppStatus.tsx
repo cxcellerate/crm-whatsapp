@@ -1,13 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../../services/api';
+import { useAuthStore } from '../../store/auth.store';
 import { Wifi, WifiOff, RefreshCw } from 'lucide-react';
 
 export function WhatsAppStatus() {
+  const token = useAuthStore((s) => s.token);
+
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['whatsapp-status'],
     queryFn: () =>
       api.get('/settings/whatsapp/status').then((r) => r.data).catch(() => ({ state: 'disconnected' })),
-    refetchInterval: 30_000,
+    refetchInterval: token ? 30_000 : false,
+    enabled: !!token,
   });
 
   const connected = data?.state === 'open' || data?.state === 'CONNECTED';
