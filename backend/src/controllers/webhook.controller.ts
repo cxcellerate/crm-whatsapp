@@ -107,8 +107,10 @@ export async function receiveZapi(req: Request, res: Response) {
   const body = req.body;
   if (body.fromMe === true) return res.sendStatus(200);
 
+  // Aceitar apenas ReceivedCallback — eventos de status (delivered, read, etc.) também
+  // carregam body.text mas NÃO são novas mensagens do usuário.
   const type: string = body.type || '';
-  if (!['ReceivedCallback'].includes(type) && !body.text) return res.sendStatus(200);
+  if (type && type !== 'ReceivedCallback') return res.sendStatus(200);
 
   const rawPhone = (body.phone || body.chatId || '').replace(/\D/g, '');
   const phone = rawPhone.startsWith('55') ? rawPhone : `55${rawPhone}`;

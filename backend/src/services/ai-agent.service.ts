@@ -323,6 +323,7 @@ export async function processAgentMessage(phone: string, userMessage: string, le
   }));
 
   let sessionCompleted = false;
+  let messageSentInThisTurn = false;
   const MAX_TOOL_ITERATIONS = 5;
   let toolIterations = 0;
 
@@ -343,6 +344,7 @@ export async function processAgentMessage(phone: string, userMessage: string, le
       logger.error(`[AI Agent SDK] Erro ao chamar Claude (iteração ${toolIterations}): ${err}`);
       if (toolIterations === 1) {
         await handleSendMessage(ctx, { message: 'Desculpe, tive um problema técnico no momento. Em breve um de nossos atendentes entrará em contato.' }).catch(() => null);
+        messageSentInThisTurn = true;
       }
       break;
     }
@@ -370,6 +372,7 @@ export async function processAgentMessage(phone: string, userMessage: string, le
         switch (name) {
           case 'send_message':
             result = await handleSendMessage(ctx, input as { message: string });
+            messageSentInThisTurn = true;
             break;
           case 'update_lead':
             result = await handleUpdateLead(ctx, input as Record<string, any>);
@@ -403,6 +406,13 @@ export async function processAgentMessage(phone: string, userMessage: string, le
     logger.warn(`[AI Agent SDK] MAX_TOOL_ITERATIONS atingido sem finish_conversation para ${phone} — forçando encerramento`);
     await handleFinishConversation(ctx, { reason: 'max_turns', summary: 'Limite de iterações atingido automaticamente.' }).catch(() => null);
     sessionCompleted = true;
+  }
+
+  // Garante que o usuário sempre receba uma resposta neste turno.
+  // Haiku às vezes chama update_lead / move_to_stage mas esquece de chamar send_message.
+  if (!messageSentInThisTurn && !sessionCompleted) {
+    logger.warn(`[AI Agent SDK] send_message não foi chamado neste turno para ${phone} — enviando continuação`);
+    await handleSendMessage(ctx, { message: 'Pode continuar, estou te ouvindo!' }).catch(() => null);
   }
 
   // Atualiza turn count e status final
